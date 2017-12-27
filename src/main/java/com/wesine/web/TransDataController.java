@@ -67,6 +67,9 @@ public class TransDataController {
 				eventMap.put("result", "");
 				eventMap.put("TransID", dataMap.get("TransID"));
 				eventMap.put("RegID", dataMap.get("RegID"));
+				eventMap.put("CashierID", dataMap.get("CashierID"));
+				eventMap.put("PictureUrl0", billList.get(i).get("PictureUrl0"));
+				eventMap.put("VideoUrl", billList.get(i).get("VideoUrl"));
 				// 时间戳 处理为date时间
 				eventMap.put("date", TimeUtil.stampToDate(dataMap.get("TsStart") + ""));
 
@@ -76,7 +79,7 @@ public class TransDataController {
 
 		eventMapper.insertEventForMany(listMap);
 		
-		System.out.println("-----"+TimeUtil.stampToDateString(dataMap.get("TsStart") + "")+"-----\n"+"本次购物共扫描"+billList.size()+"商品！\n"+"不正常扫描事件次数："+listMap.size()+"\n----end----");
+		System.out.println("-----"+TimeUtil.stampToDateString(dataMap.get("TsStart") + "")+"-----\n本次交易单号："+dataMap.get("TransID")+"\n本次购物共扫描"+billList.size()+"商品！\n"+"不正常扫描事件次数："+listMap.size()+"\n----end----");
 
 		// redisService.set("testkey", "121111");//测试redis
 

@@ -7,49 +7,29 @@
 <meta name="viewport"
 	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 <title>Insert title here</title>
-
+<script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
+<link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css"
+	rel="stylesheet"></link>
+<script src="https://cdn.bootcss.com/echarts/3.8.5/echarts.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>   
 </head>
 <body>
 	<div id="app">
 		<header class="mui-bar mui-bar-nav">
-			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<h1 class="mui-title">防损事件管理</h1>
+			<a class=""></a>
+			<h1 class="mui-title" style="font-size:20px;font-weight: bold;">{{title | changeTitle}}</h1>
 		</header>
-
-		<div class="mui-content" style="background-color: #F8F8F8;">
-			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
-				style="background-color: #F8F8F8;">
-				<li style="border: solid 1px grey; background-color: lightblue;"
-					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#"> <span class="mui-icon" >{{eventsStatus0 | getLength}}</span>
-						<p>未处理</p>
-				</a>
-				</li>
-				<li style="border: solid 1px grey;"
-					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#"> <span class="mui-icon">{{eventsStatus1 | getLength}}</span>
-						<p>暂存</p>
-				</a>
-				</li>
-				<li style="border: solid 1px grey;"
-					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#"> <span class="mui-icon">{{eventsStatus2 | getLength}}</span>
-						<p>完成</p>
-				</a>
-				</li>
-			</ul>
-
-			<div id="eventChart" style="height: 250px;"></div>
-
-			<ul class="mui-table-view"
-				style="background-color: #F8F8F8; margin-top: 20px;">
-				<li v-for="item in selectedEvents.slice(0, 3)" class="mui-table-view-cell mui-media"><a
+<!-- style=" background-color: #5D9CEC;color: white;" -->
+<div v-show="eventListPage" class="mui-content" style="background-color: #F8F8F8;">
+	<ul class="mui-table-view"
+				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
+				<li v-for="item in selectedEvents" class="mui-table-view-cell mui-media"><a
 					href="javascript:;"> <img
 						class="mui-media-object mui-pull-left"
 						src="http://placehold.it/40x30"></img>
 						<div class="mui-media-body">
 							<p class="mui-ellipsis">{{item.date}} 交易单号:{{item.TransID}}</p>
-							<p class="mui-ellipsis">王XX 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
+							<p class="mui-ellipsis">收银员ID:{{item.CashierID}} 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
 						</div>
 				</a></li>
 				<!-- <li class="mui-table-view-cell mui-media"><a
@@ -71,6 +51,67 @@
 						</div>
 				</a></li> -->
 				<li class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+					href="javascript:;"> 返回
+				</a></li> 
+			</ul>
+</div>
+
+		<div v-show="managerPage" class="mui-content" style="background-color: #F8F8F8;">
+			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
+				style="background-color: #F8F8F8;">
+				<li v-on:click="wclDivClick" v-bind:style="wcllstyleObj"  
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon" >{{eventsStatus0 | getLength}}</span>
+						<p v-bind:style="wclpObj">未处理</p>
+				</a>
+				</li>
+				<li v-on:click="zcDivClick" v-bind:style="zclstyleObj"
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon">{{eventsStatus1 | getLength}}</span>
+						<p v-bind:style="zcpObj">暂存</p>
+				</a>
+				</li>
+				<li v-on:click="wcDivClick" v-bind:style="wclstyleObj"
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon">{{eventsStatus2 | getLength}}</span>
+						<p v-bind:style="wcpObj">完成</p>
+				</a>
+				</li>
+			</ul>
+
+			<div id="eventChart" style="height: 250px;width:100%"></div>
+			<div style="height: 250px;width:100%;text-align: center;font-size: 20px;font-weight: bold;line-height: 250px;color:#5D9CEC;" v-show="isNoEventShow">{{noEventTip}}</div>
+
+			<ul class="mui-table-view"
+				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
+				<li v-for="item in selectedEvents.slice(0, 3)" class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">{{item.date}} 交易单号:{{item.TransID}}</p>
+							<p class="mui-ellipsis">收银员ID:{{item.CashierID}} 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
+						</div>
+				</a></li>
+				<!-- <li class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">2017/7/1 11:23:50 交易单号:wh20170701003</p>
+							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
+						</div>
+				</a></li>
+				<li class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">2017/7/1 11:23:50 交易单号:wh20170701003</p>
+							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
+						</div>
+				</a></li> -->
+				<li v-on:click="getMoreEvent" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
 					href="javascript:;"> 点击查看更多
 				</a></li> 
 			</ul>
@@ -86,25 +127,12 @@
 			<input type="hidden" v-model="usrID"  th:value="${usrID}" id="usrID" name="usrID" />
 
 	</div>
-
-
-</body>
-
-
-
-<script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
-<link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css"
-	rel="stylesheet"></link>
-<script src="https://cdn.bootcss.com/echarts/3.8.5/echarts.min.js"></script>
-<script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>
-
-
-
-
 <!-- vue框架 -->
-<script type="text/javascript">
-
+<script type="text/javascript" charset="utf-8">
+//alert(usrID)
 const serverPath="http://localhost:8080";//本地测试用
+//const serverPath="http://192.168.1.192:8080";//手机测试用
+//const serverPath="http://d9ae5x.natappfree.cc";//上线后 填绝对url
 
 var usrID=document.getElementById("usrID").value;
 var roleId=document.getElementById("roleId").value;
@@ -112,6 +140,7 @@ var shopID=document.getElementById("shopID").value;
 var areaID=document.getElementById("areaID").value;
 var usrName=document.getElementById("usrName").value;
 
+//alert(location.hostname)
 
 	var app = new Vue({
 		el : '#app',
@@ -122,11 +151,45 @@ var usrName=document.getElementById("usrName").value;
 			usrName : '',
 			usrID:'',
 			
+			title:'1',
+			
 			eventsStatus0:[],//未处理事件
 			eventsStatus1:[],//暂存事件
 			eventsStatus2:[],//完成事件
 			
+			
+			
 			selectedEvents:[],//当前要显示的事件
+			
+			wcllstyleObj:{//未处理li style
+				color: 'white',
+			    background:'#5D9CEC'
+			},
+			wclpObj:{
+				color: 'white',
+			},
+			zclstyleObj:{//暂存li style
+				color: '',
+			    background:'#F1F1F1'
+			},
+			zcpObj:{
+				color: '',
+			},
+			wclstyleObj:{//完成li style
+				color: '',
+			    background:'#F1F1F1'
+			},
+			wcpObj:{
+				color: '',
+			},
+			
+			
+			isEventListShow:true,
+			isNoEventShow:false,
+			noEventTip:'没有未处置事件',
+			
+			managerPage:true,
+			eventListPage:false,
 			
 		},
 		// 在 `methods` 对象中定义方法
@@ -194,9 +257,98 @@ var usrName=document.getElementById("usrName").value;
       });
 
 			},
+			
+			wclDivClick:function(){//未处理计数div被点击事件
+				//js处理li被点击后的样式
+				this.wcllstyleObj.background='#5D9CEC'
+				this.wcllstyleObj.color='white'
+				this.wclpObj.color='white'
+				
+				this.zclstyleObj.background='#F1F1F1'
+				this.zclstyleObj.color=''
+				this.zcpObj.color=''
+				
+				this.wclstyleObj.background='#F1F1F1'
+				this.wclstyleObj.color=''
+				this.wcpObj.color=''
+				//切换显示的event数据源
+				this.selectedEvents=this.eventsStatus0
+				this.title='10';
+				console.log(this.selectedEvents.length)
+				if(this.selectedEvents.length==0){
+					this.noEventTip='没有未处置事件'
+					this.isEventListShow=false
+					this.isNoEventShow=true
+				}
+				
+				
+			},
+			zcDivClick:function(){//暂存计数div被点击事件
+				//js处理li被点击后的样式
+				this.wcllstyleObj.background='#F1F1F1'
+				this.wcllstyleObj.color=''
+				this.wclpObj.color=''
+				
+				this.zclstyleObj.background='#5D9CEC'
+				this.zclstyleObj.color='white'
+				this.zcpObj.color='white'
+				
+				this.wclstyleObj.background='#F1F1F1'
+				this.wclstyleObj.color=''
+				this.wcpObj.color='' 
+				//切换显示的event数据源
+				this.selectedEvents=this.eventsStatus1
+				this.title='11';
+				console.log(this.selectedEvents.length)
+				if(this.selectedEvents.length==0){
+					this.noEventTip='没有待提交事件'
+					this.isEventListShow=false
+					this.isNoEventShow=true
+				}
+			},
+			wcDivClick:function(){//完成计数div被点击事件
+				//js处理li被点击后的样式
+				this.wcllstyleObj.background='#F1F1F1'
+				this.wcllstyleObj.color=''
+				this.wclpObj.color=''
+				
+				this.zclstyleObj.background='#F1F1F1'
+				this.zclstyleObj.color=''
+				this.zcpObj.color=''
+				
+				this.wclstyleObj.background='#5D9CEC'
+				this.wclstyleObj.color='white'
+				this.wcpObj.color='white' 
+				//切换显示的event数据源
+				this.selectedEvents=this.eventsStatus2
+				this.title='12';
+				console.log(this.selectedEvents.length)
+				if(this.selectedEvents.length==0){
+					this.noEventTip='没有已完成事件'
+					this.isEventListShow=false
+					this.isNoEventShow=true
+				}
+			},
+			getMoreEvent:function(){
+				console.log("selectedEvent:"+this.selectedEvents.length)
+				 this.managerPage=false;
+				this.eventListPage=true;
+				this.title+='s';
+				/*if(this.selectedEvents.length=this.eventsStatus0.length){
+					this.title='未处理事件列表';
+				}
+				 if(this.selectedEvents.length=this.eventsStatus1.length){
+					this.title='暂存事件列表';
+				}
+				if(this.selectedEvents.length=this.eventsStatus2.length){
+					this.title='完成事件列表';
+				}  */
+			},
+			
 
 		},
 		mounted : function() {
+			//alert("vue load ")
 			//加载隐藏域中的变量
 			this.roleId=roleId;
 			this.shopID=shopID;
@@ -214,14 +366,42 @@ var usrName=document.getElementById("usrName").value;
 		filters: {//过滤器
 			  getLength: function (value) {
 			    return value.length
-			  }
-			},
-	})
+			  },
+			  changeTitle:function(value){
+				  
+					  if(value==='1'||value==='10'||value==='11'||value==='12'){
+						  return '防损事件管理';
+					  }
+				  
+					  if(value==='10s'){
+						  return '未处理事件列表';
+					  }
+					  if(value==='11s'){
+						  return '暂存事件列表';
+					  }
+					  if(value==='12s'){
+						  return '完成事件列表';
+					  }
+			  },
+			}//过滤器 end
+	}) 
 </script>
+
+</body>
+
+
+
+
+
+
+
+
+
 
 
 
 <script type="text/javascript" charset="utf-8">
+//alert(usrID)
 	var eventChart = echarts.init(document.getElementById('eventChart'));
 
 	option = {
@@ -295,9 +475,9 @@ var usrName=document.getElementById("usrName").value;
 
 	//alert(option.toolbox.feature.myTool1.icon)
 
-	/* option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/月.svg';
-	option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/周.svg';
-	option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/日.svg'; */
+	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/月.svg';
+	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/周.svg';
+	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/日.svg';
 	//alert(option.toolbox.feature.myTool1.icon)
 
 	eventChart.setOption(option);

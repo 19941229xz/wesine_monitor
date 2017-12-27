@@ -102,7 +102,8 @@ public class UserController {
 			conditionMap.put("companyId", "1");
 			//将获取到的user信息注册到users数据表中
 			userMapper.insert(conditionMap);
-			
+			System.out.println("------新注册一名防损人员：usrID:"+usrID+"\tusrName:"
+			+usrName+"\tcompanyId:"+conditionMap.get("companyId")+"-----");
 		}
 		
 		map.put("usrID", usrID);
