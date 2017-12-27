@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Insert title here</title>
+
+</head>
+<body>
+	<div id="app">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">防损事件管理</h1>
+		</header>
+
+		<div class="mui-content" style="background-color: #F8F8F8;">
+			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
+				style="background-color: #F8F8F8;">
+				<li style="border: solid 1px grey; background-color: lightblue;"
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon" >{{eventsStatus0 | getLength}}</span>
+						<p>未处理</p>
+				</a>
+				</li>
+				<li style="border: solid 1px grey;"
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon">{{eventsStatus1 | getLength}}</span>
+						<p>暂存</p>
+				</a>
+				</li>
+				<li style="border: solid 1px grey;"
+					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon">{{eventsStatus2 | getLength}}</span>
+						<p>完成</p>
+				</a>
+				</li>
+			</ul>
+
+			<div id="eventChart" style="height: 250px;"></div>
+
+			<ul class="mui-table-view"
+				style="background-color: #F8F8F8; margin-top: 20px;">
+				<li v-for="item in selectedEvents.slice(0, 3)" class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">{{item.date}} 交易单号:{{item.TransID}}</p>
+							<p class="mui-ellipsis">王XX 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
+						</div>
+				</a></li>
+				<!-- <li class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">2017/7/1 11:23:50 交易单号:wh20170701003</p>
+							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
+						</div>
+				</a></li>
+				<li class="mui-table-view-cell mui-media"><a
+					href="javascript:;"> <img
+						class="mui-media-object mui-pull-left"
+						src="http://placehold.it/40x30"></img>
+						<div class="mui-media-body">
+							<p class="mui-ellipsis">2017/7/1 11:23:50 交易单号:wh20170701003</p>
+							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
+						</div>
+				</a></li> -->
+				<li class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+					href="javascript:;"> 点击查看更多
+				</a></li> 
+			</ul>
+
+		</div>
+
+
+		<!-- 隐藏域 -->
+		<input type="hidden" v-model="roleId" th:value="${roleId} " id="roleId" name="roleId" /> 
+			<input type="hidden" v-model="shopID" th:value="${shopID}" id="shopID" name="shopID" /> 
+			<input type="hidden" v-model="areaID" th:value="${areaID}" id="areaID" name="areaID" /> 
+			<input type="hidden" v-model="usrName" th:value="${usrName}" id="usrName" name="usrName" />
+			<input type="hidden" v-model="usrID"  th:value="${usrID}" id="usrID" name="usrID" />
+
+	</div>
+
+
+</body>
+
+
+
+<script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
+<link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css"
+	rel="stylesheet"></link>
+<script src="https://cdn.bootcss.com/echarts/3.8.5/echarts.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>
+
+
+
+
+<!-- vue框架 -->
+<script type="text/javascript">
+
+const serverPath="http://localhost:8080";//本地测试用
+
+var usrID=document.getElementById("usrID").value;
+var roleId=document.getElementById("roleId").value;
+var shopID=document.getElementById("shopID").value;
+var areaID=document.getElementById("areaID").value;
+var usrName=document.getElementById("usrName").value;
+
+
+	var app = new Vue({
+		el : '#app',
+		data : {
+			roleId : '',
+			shopID : '',
+			areaID : '',
+			usrName : '',
+			usrID:'',
+			
+			eventsStatus0:[],//未处理事件
+			eventsStatus1:[],//暂存事件
+			eventsStatus2:[],//完成事件
+			
+			selectedEvents:[],//当前要显示的事件
+			
+		},
+		// 在 `methods` 对象中定义方法
+		methods : {
+			loadEventCount : function() {
+				//alert('test')
+				mui.ajax({
+                    url : serverPath+"/getEventData",
+                    type : 'get',
+                    headers: {
+                       'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                    data : { 
+                    	"areaID" : this.areaID ,
+                    	"usrName" : this.usrName ,
+                    	"usrID" : this.usrID ,
+                    	"shopID" : this.shopID ,
+                    	"roleId" : this.roleId ,
+                    	
+                    }, 
+                    timeout : 10000,
+                    success : (data) => { 
+
+                        //var result = eval('('+ data +')');    //js原生方法解析json字符串为json对象
+                    	//vue.data  load  data
+                        this.eventsStatus0=data.eventsStatus0
+                    	this.eventsStatus1=data.eventsStatus1
+                    	this.eventsStatus2=data.eventsStatus2
+                    	//登陆页面后 默认先加载未处理事件
+                    	this.selectedEvents=data.eventsStatus0
+                    	
+                    	//如果是防损员及 roleId=1 时  判断是否关联款台（本月）
+                    	if(data.status==="2"){
+                    		//提示关联款台
+                    		var btnArray = ['否', '是'];
+
+                			mui.confirm('是否现在去关联款台？', '未关联款台', btnArray, function(e) {
+
+                    		if (e.index == 1) {
+                        	//去关联款台
+
+                        	
+                        	
+                    		} else {
+                    		//不去关联款台
+                    		
+			                       	
+			                }
+			
+			                })
+                    	}
+                    	
+                    	//mui.toast("欢迎使用微晟防损管理系统")
+                    	//mui.alert("欢迎使用微晟防损管理系统")
+                    	
+                    	console.log('未处理：'+this.eventsStatus0.length+'\n暂存：'+this.eventsStatus1.length+
+                    			'\n完成：'+this.eventsStatus2.length)
+                    	
+                    },
+                    error : function(xhr,type,errorThrown){
+                        console.log(xhr);
+                        console.log(type);
+                        console.log(errorThrown);
+                    }
+      });
+
+			},
+
+		},
+		mounted : function() {
+			//加载隐藏域中的变量
+			this.roleId=roleId;
+			this.shopID=shopID;
+			this.areaID=areaID;
+			this.usrName=usrName;
+			this.usrID=usrID;
+			
+			console.log("---login action---\nusrID:"+this.usrID+"\nareaID:"+this.areaID+"\nusrName:"+
+					this.usrName+"\nshopID:"+this.shopID+"\nroleId:"+this.roleId+"\n---end---")
+			
+			this.loadEventCount();
+			
+			//alert('load success'+this.usrID)
+		},
+		filters: {//过滤器
+			  getLength: function (value) {
+			    return value.length
+			  }
+			},
+	})
+</script>
+
+
+
+<script type="text/javascript" charset="utf-8">
+	var eventChart = echarts.init(document.getElementById('eventChart'));
+
+	option = {
+		title : {
+			text : '防损事件',
+			show : true,
+			textStyle : {
+				fontWeight : 'normal',
+				fontSize : 15,
+			}
+		},
+		tooltip : {
+			trigger : 'axis'
+		},
+		legend : {
+			data : [ '邮件营销' ],
+			show : false
+		},
+		grid : {
+			left : '3%',
+			right : '4%',
+			bottom : '3%',
+			containLabel : true,
+			show : true
+		},
+		toolbox : {
+			itemSize : 25,
+			feature : {
+				myTool1 : {
+					show : true,
+					title : '按月统计',
+					icon : 'image://http://localhost:8080/static/img/月.svg',
+					onclick : function() {
+						//							alert('myToolHandler1')
+					}
+				},
+				myTool2 : {
+					show : true,
+					title : '按周统计',
+					icon : 'image://http://localhost:8080/static/img/周.svg',
+					onclick : function() {
+						//							alert('myToolHandler2')
+					}
+				},
+				myTool3 : {
+					show : true,
+					title : '按日统计',
+					icon : 'image://http://localhost:8080/static/img/日.svg',
+					onclick : function() {
+						//							alert('myToolHandler2')
+					}
+				}
+			},
+
+		},
+		xAxis : {
+			type : 'category',
+			boundaryGap : false,
+			data : [ '周一', '周二', '周三', '周四', '周五', '周六', '周日' ]
+		},
+		yAxis : {
+			type : 'value'
+		},
+		series : [ {
+			name : '邮件营销',
+			type : 'line',
+			stack : '总量',
+			data : [ 120, 132, 101, 134, 90, 230, 210 ]
+		} ]
+	};
+
+	//alert(option.toolbox.feature.myTool1.icon)
+
+	/* option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/月.svg';
+	option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/周.svg';
+	option.toolbox.feature.myTool1.icon='image://http://'+window.location.host+'/static/img/日.svg'; */
+	//alert(option.toolbox.feature.myTool1.icon)
+
+	eventChart.setOption(option);
+</script>
+
+
+
+
+
+
+</html>

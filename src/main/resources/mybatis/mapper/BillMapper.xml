@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wesine.dao.BillMapper">
+
+	<insert id="insertBillsForMany" parameterType="java.util.List">
+		<selectKey resultType="String" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into bills
+		(Start, End, VideoUrl, PictureUrl0,PictureUrl1,PictureUrl2,PictureUrl3,Sku,Text
+		,CenterX,CenterY,Type,Hide,transId)
+		values
+		<foreach collection="list" item="bill" index="index"
+			separator=",">
+			(
+			#{bill.Start},#{bill.End},#{bill.VideoUrl},#{bill.PictureUrl0}
+			,#{bill.PictureUrl1},#{bill.PictureUrl2},#{bill.PictureUrl3},#{bill.Sku}
+			,#{bill.Text},#{bill.CenterX},#{bill.CenterY},#{bill.Type},#{bill.Hide},#{bill.transId}
+			)
+		</foreach>
+	</insert>
+
+
+</mapper>
