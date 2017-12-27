@@ -15,12 +15,48 @@
 </head>
 <body>
 	<div id="app">
+	
 		<header class="mui-bar mui-bar-nav">
-			<a class=""></a>
+			<a v-show="back_button" v-on:tap="back" style="color:black;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="menu" v-if="!back_button" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="#topPopover"></a>
 			<h1 class="mui-title" style="font-size:20px;font-weight: bold;">{{title | changeTitle}}</h1>
 		</header>
+		
+		<!--右上角弹出菜单-->
+		
+					<!-- <ul class="mui-table-view">
+						<li class="mui-table-view-cell">
+							<a href="#">Item1</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item2</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item3</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item4</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item5</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item6</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item7</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item8</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item9</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">Item10</a>
+						</li>
+					</ul> -->
+				
+		
 <!-- style=" background-color: #5D9CEC;color: white;" -->
 <div v-show="eventListPage" class="mui-content" style="background-color: #F8F8F8;">
+
+
+
+
+
+
 	<ul class="mui-table-view"
 				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
 				<li v-for="item in selectedEvents" class="mui-table-view-cell mui-media"><a
@@ -50,28 +86,31 @@
 							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
 						</div>
 				</a></li> -->
-				<li class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+				<li v-on:tap="back" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
 					href="javascript:;"> 返回
 				</a></li> 
 			</ul>
 </div>
 
+
+
+
 		<div v-show="managerPage" class="mui-content" style="background-color: #F8F8F8;">
 			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
 				style="background-color: #F8F8F8;">
-				<li v-on:click="wclDivClick" v-bind:style="wcllstyleObj"  
+				<li v-on:tap="wclDivClick" v-bind:style="wcllstyleObj"  
 					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#"> <span class="mui-icon" >{{eventsStatus0 | getLength}}</span>
 						<p v-bind:style="wclpObj">未处理</p>
 				</a>
 				</li>
-				<li v-on:click="zcDivClick" v-bind:style="zclstyleObj"
+				<li v-on:tap="zcDivClick" v-bind:style="zclstyleObj"
 					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#"> <span class="mui-icon">{{eventsStatus1 | getLength}}</span>
 						<p v-bind:style="zcpObj">暂存</p>
 				</a>
 				</li>
-				<li v-on:click="wcDivClick" v-bind:style="wclstyleObj"
+				<li v-on:tap="wcDivClick" v-bind:style="wclstyleObj"
 					class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
 					<a href="#"> <span class="mui-icon">{{eventsStatus2 | getLength}}</span>
 						<p v-bind:style="wcpObj">完成</p>
@@ -111,9 +150,13 @@
 							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
 						</div>
 				</a></li> -->
-				<li v-on:click="getMoreEvent" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+				<li v-on:tap="getMoreEvent" v-if="selectedEvents.length>3" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
 					href="javascript:;"> 点击查看更多
 				</a></li> 
+				<li v-if="!(selectedEvents.length>3)" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+					href="javascript:;"> 没有更多了
+				</a></li>
+				
 			</ul>
 
 		</div>
@@ -151,7 +194,7 @@ var usrName=document.getElementById("usrName").value;
 			usrName : '',
 			usrID:'',
 			
-			title:'1',
+			title:'10',
 			
 			eventsStatus0:[],//未处理事件
 			eventsStatus1:[],//暂存事件
@@ -190,6 +233,9 @@ var usrName=document.getElementById("usrName").value;
 			
 			managerPage:true,
 			eventListPage:false,
+			
+			back_button:false,//左上角返回按钮是否可见
+			
 			
 		},
 		// 在 `methods` 对象中定义方法
@@ -333,6 +379,7 @@ var usrName=document.getElementById("usrName").value;
 				console.log("selectedEvent:"+this.selectedEvents.length)
 				 this.managerPage=false;
 				this.eventListPage=true;
+				this.back_button=true;
 				this.title+='s';
 				/*if(this.selectedEvents.length=this.eventsStatus0.length){
 					this.title='未处理事件列表';
@@ -344,6 +391,16 @@ var usrName=document.getElementById("usrName").value;
 					this.title='完成事件列表';
 				}  */
 			},
+			back:function(){
+				this.managerPage=true;
+				this.eventListPage=false;
+				this.back_button=false;
+				//去点最后一个字符  s
+				var basic=this.title;
+				basic = basic.substr(0, basic.length - 1); 
+				this.title=basic;
+				//console.log("title:"+this.title)
+			}
 			
 
 		},
@@ -374,6 +431,7 @@ var usrName=document.getElementById("usrName").value;
 					  }
 				  
 					  if(value==='10s'){
+						  //console.log(back_button)
 						  return '未处理事件列表';
 					  }
 					  if(value==='11s'){
