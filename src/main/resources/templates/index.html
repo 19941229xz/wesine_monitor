@@ -12,6 +12,18 @@
 	rel="stylesheet"></link>
 <script src="https://cdn.bootcss.com/echarts/3.8.5/echarts.min.js"></script>
 <script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>   
+
+<style type="text/css">
+
+/*toast信息提示*/
+.mui-toast-container {bottom: 50% !important;}
+.mui-toast-message {opacity: 0.6; color: #fff; width: 250px; padding: 10px 5px 10px 5px;font-size:20px;}
+
+
+
+</style>
+
+
 </head>
 <body>
 	<div id="app">
@@ -77,26 +89,8 @@
 
 
 
-<div v-show="!(managerPage||eventListPage)" class="mui-content" style="background-color: #F8F8F8;">
-<!-- 款台绑定页 -->
-<div class="mui-card">
-				<form class="mui-input-group">
-					<div v-for="counter in counterList" class="mui-input-row mui-checkbox" style="height: 50px;">
-						<label :for="counter.id" style="line-height: 2.0;">ID:{{counter.id}} &nbsp;&nbsp;名称:{{counter.name}}&nbsp;&nbsp; 类型:{{counter.typeId | changeTitle}}</label>
-						<input :id="counter.id" style="font-size: 40px;line-height:0.8 ;"  :value="counter.id" type="checkbox" v-model="counterPicked"  defaultChecked=""></input>
-					</div>
-					 <div class="mui-input-row mui-checkbox">
-						{{counterPicked}}
-						<!-- 隐藏域 判断是否有checkbox点击 -->
-					</div>
-					<!--<div class="mui-input-row mui-checkbox mui-disabled">
-						<label>disabled checkbox</label>
-						<input name="checkbox1" type="checkbox" disabled="disabled"></input>
-					</div> -->
-				</form>
-			</div>
-<!-- 款台绑定页  end -->
-</div>
+
+
 
 <!-- 防损管理首页 -->
 		<div v-show="managerPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
@@ -166,6 +160,31 @@
 			</ul>
 
 		</div>
+		
+		
+		
+		<!-- !(managerPage||eventListPage) -->
+<div v-show="!(managerPage||eventListPage)" class="mui-content" style="background-color: #F8F8F8;">
+<!-- 款台绑定页 -->
+<div class="mui-card">
+				<form class="mui-input-group">
+					<div v-for="counter in counterList" class="mui-input-row mui-checkbox" style="height: 50px;">
+						<label :for="counter.id" style="line-height: 2.0;text-align: justify;">ID:{{counter.id}}名称:{{counter.name}}类型:{{counter.typeId | changeTitle}} </label>
+						<input :id="counter.id" style="font-size: 40px;line-height:0.8 ;"  :value="counter.id" type="checkbox" v-model="counterPicked"  ></input>
+					</div>
+					 <div class="mui-input-row mui-checkbox">
+						{{counterPicked}}
+						<!-- 隐藏域 判断是否有checkbox点击 -->
+					</div>
+					<!--<div class="mui-input-row mui-checkbox mui-disabled">
+						<label>disabled checkbox</label>
+						<input name="checkbox1" type="checkbox" disabled="disabled"></input>
+					</div> -->
+				</form>
+			</div>
+			<button v-on:tap="saveUserCounter" type="button" class="mui-btn mui-btn-primary mui-btn-block " style="position: fixed;bottom:0px;margin-bottom: 0px;">保存</button>
+</div>
+<!-- 款台绑定页  end -->
 
 
 		<!-- 隐藏域 -->
@@ -429,10 +448,13 @@ var usrName=document.getElementById("usrName").value;
 				this.counterOption=!this.counterOption;
 			},
 			toEditCounter:function(){//跳转至 关联款台页面
+				//关联的款台 check状态为checked
+				this.showRelatedCounters();
 				this.managerPage=false;
 				this.eventListPage=false;
 				this.counterOption=false;
 				this.back_button=true;
+				mui.toast('点击保存绑定才会生效喔')
 				this.title='13s';
 			},
 			closeCounterOpt:function(){
@@ -453,10 +475,6 @@ var usrName=document.getElementById("usrName").value;
                     	this.counterList=data.counterList;
                     	this.userCounter=data.userCounter; 
                     	console.log('绑定款台数量：'+this.userCounter.length);
-                    	/* for(var i=0;i<this.userCounter.length;i++){
-                    		this.counterPicked.push(this.userCounter[i].counterId);
-                    	} */
-                    	console.log("push："+this.counterPicked.length)
                     	
                     },
                     error : function(xhr,type,errorThrown){
@@ -465,7 +483,49 @@ var usrName=document.getElementById("usrName").value;
                         console.log(errorThrown);
                     }
 				});
-			}
+			},
+			showRelatedCounters:function(){
+				//先清空  在push
+				this.counterPicked=[];
+				this.counterPicked.push(this.userCounter[this.userCounter.length-1].counterId)
+				//console.log("userCounter first:"+this.userCounter[this.userCounter.length-1].counterId)
+				
+				for(var i=0;i<this.userCounter.length;i++){
+            		this.counterPicked.push(this.userCounter[i].counterId);
+            	} 
+            	console.log("push："+this.counterPicked.length)
+            	/* var str='';
+            	for(var i=0;i<this.counterPicked.length;i++){
+            		str+=','+this.counterPicked[i];
+            	} */
+			},
+			saveUserCounter:function(){
+				mui.ajax({
+					url : serverPath+"/saveUserCounter/"+this.usrID,
+                    type : 'post',
+                    headers: {
+                       'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                  data : { 
+                  	"counterId":this.counterPicked
+                  }, 
+                  timeout : 10000,
+                  success : (data) => {
+                  	if(data.status==0){
+                  		mui.toast('绑定成功');
+                  		//跳转到manager页面  重载event数据  和 counter数据
+                  		
+                  	}
+                  	
+                  },
+                  error : function(xhr,type,errorThrown){
+                      console.log(xhr);
+                      console.log(type);
+                      console.log(errorThrown);
+                  }
+				});
+				
+			},
 			
 
 		},
