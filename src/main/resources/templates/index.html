@@ -15,45 +15,28 @@
 </head>
 <body>
 	<div id="app">
-	
 		<header class="mui-bar mui-bar-nav">
 			<a v-show="back_button" v-on:tap="back" style="color:black;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<a id="menu" v-if="!back_button" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="#topPopover"></a>
+			<a id="" v-on:tap="showCounterOpt" v-if="!back_button" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right"></a>
+			<!--右上角弹出菜单-->
+		
+					<ul id="topMenu" class="mui-table-view" style="width:30%;position: fixed;top: 45px;z-index:999;right: 0" v-show="counterOption" >
+						<li class="mui-table-view-cell">
+							<a v-on:tap="toEditCounter" href="#">关联款台</a>
+						</li>
+						<!-- <li class="mui-table-view-cell"><a href="#">绑定所有</a>
+						</li>
+						<li class="mui-table-view-cell"><a href="#">解绑所有</a>
+						</li> -->
+					</ul> 
 			<h1 class="mui-title" style="font-size:20px;font-weight: bold;">{{title | changeTitle}}</h1>
 		</header>
 		
-		<!--右上角弹出菜单-->
 		
-					<!-- <ul class="mui-table-view">
-						<li class="mui-table-view-cell">
-							<a href="#">Item1</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item2</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item3</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item4</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item5</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item6</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item7</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item8</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item9</a>
-						</li>
-						<li class="mui-table-view-cell"><a href="#">Item10</a>
-						</li>
-					</ul> -->
 				
 		
-<!-- style=" background-color: #5D9CEC;color: white;" -->
-<div v-show="eventListPage" class="mui-content" style="background-color: #F8F8F8;">
-
-
-
+<!-- 查看更多事件页面 -->
+<div v-show="eventListPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
 
 
 
@@ -94,8 +77,32 @@
 
 
 
+<div v-show="!(managerPage||eventListPage)" class="mui-content" style="background-color: #F8F8F8;">
+<!-- 款台绑定页 -->
+<div class="mui-card">
+				<form class="mui-input-group">
+					<div class="mui-input-row mui-checkbox">
+						<label>checked：false</label>
+						<label>checked：false</label>
+						<input name="checkbox1" value="Item 3" type="checkbox" checked=""></input>
+					</div>
+					<div class="mui-input-row mui-checkbox">
+						<label>checked：true</label>
+						<input name="checkbox1" value="Item 4" type="checkbox" checked="checked"></input>
+					</div>
+					<div class="mui-input-row mui-checkbox mui-disabled">
+						<label>disabled checkbox</label>
+						<input name="checkbox1" type="checkbox" disabled="disabled"></input>
+					</div>
+				</form>
+			</div>
+<!-- 款台绑定页  end -->
+</div>
 
-		<div v-show="managerPage" class="mui-content" style="background-color: #F8F8F8;">
+<!-- 防损管理首页 -->
+		<div v-show="managerPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
+		
+		
 			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
 				style="background-color: #F8F8F8;">
 				<li v-on:tap="wclDivClick" v-bind:style="wcllstyleObj"  
@@ -184,6 +191,9 @@ var areaID=document.getElementById("areaID").value;
 var usrName=document.getElementById("usrName").value;
 
 //alert(location.hostname)
+/* document.onclick=function(){
+	mui("#topMenu").style.display='none';
+} */
 
 	var app = new Vue({
 		el : '#app',
@@ -233,8 +243,10 @@ var usrName=document.getElementById("usrName").value;
 			
 			managerPage:true,
 			eventListPage:false,
+			counterEditPage:false,
 			
 			back_button:false,//左上角返回按钮是否可见
+			counterOption:false,
 			
 			
 		},
@@ -381,15 +393,6 @@ var usrName=document.getElementById("usrName").value;
 				this.eventListPage=true;
 				this.back_button=true;
 				this.title+='s';
-				/*if(this.selectedEvents.length=this.eventsStatus0.length){
-					this.title='未处理事件列表';
-				}
-				 if(this.selectedEvents.length=this.eventsStatus1.length){
-					this.title='暂存事件列表';
-				}
-				if(this.selectedEvents.length=this.eventsStatus2.length){
-					this.title='完成事件列表';
-				}  */
 			},
 			back:function(){
 				this.managerPage=true;
@@ -398,8 +401,29 @@ var usrName=document.getElementById("usrName").value;
 				//去点最后一个字符  s
 				var basic=this.title;
 				basic = basic.substr(0, basic.length - 1); 
+				if(basic=='13'){//刚刚从款台页面跳回的
+					//重新从后台获取event数据
+
+					//默认重新加载未处理事件
+					basic='10';
+					//切换显示的event数据源  到未处理事件
+					this.selectedEvents=this.eventsStatus0
+				}
 				this.title=basic;
-				//console.log("title:"+this.title)
+				console.log("title:"+this.title)
+			},
+			showCounterOpt:function(){
+				this.counterOption=!this.counterOption;
+			},
+			toEditCounter:function(){//跳转至 关联款台页面
+				this.managerPage=false;
+				this.eventListPage=false;
+				this.counterOption=false;
+				this.back_button=true;
+				this.title='13s';
+			},
+			closeCounterOpt:function(){
+				this.counterOption=false;
 			}
 			
 
@@ -417,6 +441,7 @@ var usrName=document.getElementById("usrName").value;
 					this.usrName+"\nshopID:"+this.shopID+"\nroleId:"+this.roleId+"\n---end---")
 			
 			this.loadEventCount();
+			
 			
 			//alert('load success'+this.usrID)
 		},
@@ -439,6 +464,9 @@ var usrName=document.getElementById("usrName").value;
 					  }
 					  if(value==='12s'){
 						  return '完成事件列表';
+					  }
+					  if(value==='13s'){
+						  return '款台列表';
 					  }
 			  },
 			}//过滤器 end
