@@ -81,19 +81,18 @@
 <!-- 款台绑定页 -->
 <div class="mui-card">
 				<form class="mui-input-group">
-					<div class="mui-input-row mui-checkbox">
-						<label>checked：false</label>
-						<label>checked：false</label>
-						<input name="checkbox1" value="Item 3" type="checkbox" checked=""></input>
+					<div v-for="counter in counterList" class="mui-input-row mui-checkbox" style="height: 50px;">
+						<label :for="counter.id" style="line-height: 2.0;">ID:{{counter.id}} &nbsp;&nbsp;名称:{{counter.name}}&nbsp;&nbsp; 类型:{{counter.typeId | changeTitle}}</label>
+						<input :id="counter.id" style="font-size: 40px;line-height:0.8 ;"  :value="counter.id" type="checkbox" v-model="counterPicked"  defaultChecked=""></input>
 					</div>
-					<div class="mui-input-row mui-checkbox">
-						<label>checked：true</label>
-						<input name="checkbox1" value="Item 4" type="checkbox" checked="checked"></input>
+					 <div class="mui-input-row mui-checkbox">
+						{{counterPicked}}
+						<!-- 隐藏域 判断是否有checkbox点击 -->
 					</div>
-					<div class="mui-input-row mui-checkbox mui-disabled">
+					<!--<div class="mui-input-row mui-checkbox mui-disabled">
 						<label>disabled checkbox</label>
 						<input name="checkbox1" type="checkbox" disabled="disabled"></input>
-					</div>
+					</div> -->
 				</form>
 			</div>
 <!-- 款台绑定页  end -->
@@ -248,6 +247,11 @@ var usrName=document.getElementById("usrName").value;
 			back_button:false,//左上角返回按钮是否可见
 			counterOption:false,
 			
+			counterList:[],
+			userCounter:[],
+			
+			counterPicked:[],
+			
 			
 		},
 		// 在 `methods` 对象中定义方法
@@ -334,9 +338,12 @@ var usrName=document.getElementById("usrName").value;
 				this.title='10';
 				console.log(this.selectedEvents.length)
 				if(this.selectedEvents.length==0){
-					this.noEventTip='没有未处置事件'
-					this.isEventListShow=false
-					this.isNoEventShow=true
+					this.noEventTip='没有未处置事件';
+					this.isEventListShow=false;
+					this.isNoEventShow=true;
+				}else{
+					this.isEventListShow=true;
+					this.isNoEventShow=false;
 				}
 				
 				
@@ -362,6 +369,9 @@ var usrName=document.getElementById("usrName").value;
 					this.noEventTip='没有待提交事件'
 					this.isEventListShow=false
 					this.isNoEventShow=true
+				}else{
+					this.isEventListShow=true;
+					this.isNoEventShow=false;
 				}
 			},
 			wcDivClick:function(){//完成计数div被点击事件
@@ -385,6 +395,9 @@ var usrName=document.getElementById("usrName").value;
 					this.noEventTip='没有已完成事件'
 					this.isEventListShow=false
 					this.isNoEventShow=true
+				}else{
+					this.isEventListShow=true;
+					this.isNoEventShow=false;
 				}
 			},
 			getMoreEvent:function(){
@@ -424,6 +437,34 @@ var usrName=document.getElementById("usrName").value;
 			},
 			closeCounterOpt:function(){
 				this.counterOption=false;
+			},
+			loadCounterListData:function(){
+				mui.ajax({//向服务器获取款台数据
+					url : serverPath+"/getCounterListByShopId/"+this.shopID+'/'+this.usrID,
+                    type : 'get',
+                    headers: {
+                       'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                    data : { 
+                    	
+                    }, 
+                    timeout : 10000,
+                    success : (data) => {
+                    	this.counterList=data.counterList;
+                    	this.userCounter=data.userCounter; 
+                    	console.log('绑定款台数量：'+this.userCounter.length);
+                    	/* for(var i=0;i<this.userCounter.length;i++){
+                    		this.counterPicked.push(this.userCounter[i].counterId);
+                    	} */
+                    	console.log("push："+this.counterPicked.length)
+                    	
+                    },
+                    error : function(xhr,type,errorThrown){
+                        console.log(xhr);
+                        console.log(type);
+                        console.log(errorThrown);
+                    }
+				});
 			}
 			
 
@@ -441,6 +482,7 @@ var usrName=document.getElementById("usrName").value;
 					this.usrName+"\nshopID:"+this.shopID+"\nroleId:"+this.roleId+"\n---end---")
 			
 			this.loadEventCount();
+			this.loadCounterListData();
 			
 			
 			//alert('load success'+this.usrID)
@@ -449,7 +491,7 @@ var usrName=document.getElementById("usrName").value;
 			  getLength: function (value) {
 			    return value.length
 			  },
-			  changeTitle:function(value){
+			  changeTitle:function(value){//字符串 过滤处理器 根据需要配置
 				  
 					  if(value==='1'||value==='10'||value==='11'||value==='12'){
 						  return '防损事件管理';
@@ -468,6 +510,17 @@ var usrName=document.getElementById("usrName").value;
 					  if(value==='13s'){
 						  return '款台列表';
 					  }
+					  if(value==0){
+						  return '传统银台';
+					  }
+					  if(value==1){
+						  return '自助银台';
+					  }
+					  
+					  console.log('当前用户roleId:'+this.roleId);
+			  },
+			  watchNumChange:function(value){
+				  
 			  },
 			}//过滤器 end
 	}) 
