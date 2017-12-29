@@ -33,7 +33,7 @@
 			<!--右上角弹出菜单-->
 		
 					<ul id="topMenu" class="mui-table-view" style="width:30%;position: fixed;top: 45px;z-index:999;right: 0" v-show="counterOption" >
-						<li class="mui-table-view-cell">
+						<li v-show="option_glkt" class="mui-table-view-cell">
 							<a v-on:tap="toEditCounter" href="#">关联款台</a>
 						</li>
 						<!-- <li class="mui-table-view-cell"><a href="#">绑定所有</a>
@@ -198,8 +198,8 @@
 <!-- vue框架 -->
 <script type="text/javascript" charset="utf-8">
 //alert(usrID)
-const serverPath="http://localhost:8080";//本地测试用
-//const serverPath="http://192.168.1.192:8080";//手机测试用
+//const serverPath="http://localhost:8080";//本地测试用
+const serverPath="http://192.168.1.198:8080";//手机测试用
 //const serverPath="http://d9ae5x.natappfree.cc";//上线后 填绝对url
 
 var usrID=document.getElementById("usrID").value;
@@ -265,6 +265,7 @@ var usrName=document.getElementById("usrName").value;
 			
 			back_button:false,//左上角返回按钮是否可见
 			counterOption:false,
+			option_glkt:true,
 			
 			counterList:[],
 			userCounter:[],
@@ -276,6 +277,9 @@ var usrName=document.getElementById("usrName").value;
 		// 在 `methods` 对象中定义方法
 		methods : {
 			loadEventCount : function() {
+				
+				var _self=this;
+				
 				//alert('test')
 				mui.ajax({
                     url : serverPath+"/getEventData",
@@ -292,15 +296,16 @@ var usrName=document.getElementById("usrName").value;
                     	
                     }, 
                     timeout : 10000,
-                    success : (data) => { 
+                    success : function(data){ 
 
                         //var result = eval('('+ data +')');    //js原生方法解析json字符串为json对象
                     	//vue.data  load  data
-                        this.eventsStatus0=data.eventsStatus0
-                    	this.eventsStatus1=data.eventsStatus1
-                    	this.eventsStatus2=data.eventsStatus2
+                        _self.eventsStatus0=data.eventsStatus0;
+                    	_self.eventsStatus1=data.eventsStatus1;
+                    	_self.eventsStatus2=data.eventsStatus2;
                     	//登陆页面后 默认先加载未处理事件
-                    	this.selectedEvents=data.eventsStatus0
+                    	_self.selectedEvents=data.eventsStatus0;
+                    	
                     	
                     	//如果是防损员及 roleId=1 时  判断是否关联款台（本月）
                     	if(data.status==="2"){
@@ -326,8 +331,8 @@ var usrName=document.getElementById("usrName").value;
                     	//mui.toast("欢迎使用微晟防损管理系统")
                     	//mui.alert("欢迎使用微晟防损管理系统")
                     	
-                    	console.log('未处理：'+this.eventsStatus0.length+'\n暂存：'+this.eventsStatus1.length+
-                    			'\n完成：'+this.eventsStatus2.length)
+                    	 console.log('未处理：'+_self.eventsStatus0.length+'\n暂存：'+_self.eventsStatus1.length+
+                    			'\n完成：'+_self.eventsStatus2.length) 
                     	
                     },
                     error : function(xhr,type,errorThrown){
@@ -335,9 +340,9 @@ var usrName=document.getElementById("usrName").value;
                         console.log(type);
                         console.log(errorThrown);
                     }
-      });
+      		});
 
-			},
+		},
 			
 			wclDivClick:function(){//未处理计数div被点击事件
 				//js处理li被点击后的样式
@@ -446,6 +451,11 @@ var usrName=document.getElementById("usrName").value;
 			},
 			showCounterOpt:function(){
 				this.counterOption=!this.counterOption;
+				
+				if(this.roleId==='2'){//这是防损经理  默认关联所有款台
+					this.option_glkt=false;
+				} 
+				
 			},
 			toEditCounter:function(){//跳转至 关联款台页面
 				//关联的款台 check状态为checked
@@ -461,6 +471,9 @@ var usrName=document.getElementById("usrName").value;
 				this.counterOption=false;
 			},
 			loadCounterListData:function(){
+				
+				var _self=this;
+				
 				mui.ajax({//向服务器获取款台数据
 					url : serverPath+"/getCounterListByShopId/"+this.shopID+'/'+this.usrID,
                     type : 'get',
@@ -471,10 +484,10 @@ var usrName=document.getElementById("usrName").value;
                     	
                     }, 
                     timeout : 10000,
-                    success : (data) => {
-                    	this.counterList=data.counterList;
-                    	this.userCounter=data.userCounter; 
-                    	console.log('绑定款台数量：'+this.userCounter.length);
+                    success : function(data){
+                    	_self.counterList=data.counterList;
+                    	_self.userCounter=data.userCounter; 
+                    	console.log('绑定款台数量：'+_self.userCounter.length);
                     	
                     },
                     error : function(xhr,type,errorThrown){
@@ -486,34 +499,53 @@ var usrName=document.getElementById("usrName").value;
 			},
 			showRelatedCounters:function(){
 				//先清空  在push
+				var _self=this;
 				this.counterPicked=[];
-				this.counterPicked.push(this.userCounter[this.userCounter.length-1].counterId)
-				//console.log("userCounter first:"+this.userCounter[this.userCounter.length-1].counterId)
+				
 				
 				for(var i=0;i<this.userCounter.length;i++){
-            		this.counterPicked.push(this.userCounter[i].counterId);
+					_self.counterPicked.push((this.userCounter)[i].counterId);
             	} 
+				
+				
             	console.log("push："+this.counterPicked.length)
             	/* var str='';
             	for(var i=0;i<this.counterPicked.length;i++){
             		str+=','+this.counterPicked[i];
             	} */
 			},
+			test:function(i){
+				this.counterPicked.push((this.userCounter)[i].counterId);
+			},
 			saveUserCounter:function(){
+				
+				var _self=this;
+				
+				var counterId='';
+				
+				for(var i=0;i<this.counterPicked.length;i++){
+					if(i==0){
+						counterId+=this.counterPicked[i];
+					}else{
+					counterId+=','+this.counterPicked[i];
+					}
+				}
+				
 				mui.ajax({
 					url : serverPath+"/saveUserCounter/"+this.usrID,
-                    type : 'post',
+                    type : 'get',
                     headers: {
                        'Content-Type': 'application/x-www-form-urlencoded'
                   },
                   data : { 
-                  	"counterId":this.counterPicked
+                  	"counterId":counterId
                   }, 
                   timeout : 10000,
-                  success : (data) => {
+                  success : function(data){
                   	if(data.status==0){
                   		mui.toast('绑定成功');
                   		//跳转到manager页面  重载event数据  和 counter数据
+                  		_self.back();
                   		
                   	}
                   	
