@@ -27,6 +27,11 @@
 </head>
 <body>
 	<div id="app">
+	
+	<div v-show="loadingPage" style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
+		<img  style="margin-top: 230px;"  alt="" src="http://localhost:8080/static/img/loading.gif">
+	</div>
+	
 		<header class="mui-bar mui-bar-nav">
 			<a v-show="back_button" v-on:tap="back" style="color:black;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<a id="" v-on:tap="showCounterOpt" v-if="!back_button" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right"></a>
@@ -54,7 +59,7 @@
 
 	<ul class="mui-table-view"
 				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
-				<li v-for="item in selectedEvents" class="mui-table-view-cell mui-media"><a
+				<li v-for="item in selectedEvents" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
 					href="javascript:;"> <img
 						class="mui-media-object mui-pull-left"
 						src="http://placehold.it/40x30"></img>
@@ -87,9 +92,58 @@
 			</ul>
 </div>
 
+<!-- 事件详情页 -->
+<div v-show="detailPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
 
+<h1 class="mui-title" style="font-size: 25px;">{{detailEvent.date}}({{detailEvent.status}})</h1>
 
+			<video id="video" width="100%" height="240" style="margin-top: 25px;" controls>
+			  <!-- <source :src="detailEvent.VideoUrl"  type="video/mp4"> -->
+			  
+			  <source src="" type="video/mp4">
+                    <!-- <source  :src="VideoUrl" type="video/ogg">
+                    <source  :src="VideoUrl" type="video/webm">
+                    <object :data="VideoUrl" >
+                        <embed  :src="VideoUrl" />
+                    </object>
+                    <p>很抱歉！您的浏览器不支持视频控件请更新版本/使用uc浏览器等</p> -->
+			</video>
 
+			<form class="mui-input-group">
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>收银员</label>
+					<input style="height: 50px;line-height: 50px;font-size: 25px;" type="text" disabled="disabled" :placeholder="detailEvent.CashierID">
+				</div>
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>交易单号</label>
+					<input style="height: 50px;line-height: 50px;font-size: 25px;" type="text" disabled="disabled" :placeholder="detailEvent.TransID">
+				</div>
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>审核结论</label>
+					<select id="result" style="height: 50px;line-height: 50px;font-size: 25px;" :disabled="disabled" @change="watchEditChange" v-model="detailEvent.result">
+						<option value="漏扫">漏扫</option>
+						<option value="补扫">补扫</option>
+						<!-- 暂时写死 -->
+					</select>
+				</div>
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>备注</label>
+					<input id="save_comment" style="height: 50px;line-height: 50px;font-size: 25px;" :disabled="disabled" type="text" v-model="detailEvent.comment" placeholder="">
+				</div>
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>商品名称</label>
+					<input id="save_productName" style="height: 50px;line-height: 50px;font-size: 25px;" :disabled="disabled" type="text" v-model="detailEvent.productName"  placeholder="">
+				</div>
+				<div style="height: 50px;line-height: 50px;font-size: 25px;" class="mui-input-row ">
+					<label>金额</label>
+					<input id="save_money" style="height: 50px;line-height: 50px;font-size: 25px;" :disabled="disabled" type="number" pattern="[0-9]*" v-model="detailEvent.money"  placeholder="">
+				</div>
+			</form>
+				<div class="mui-button-row">
+					<button v-show="detailBtnShow"  type="button" style="position: absolute;top: 0px;" class="mui-btn mui-btn-block  mui-btn-primary" v-on:tap="saveEditResult(detailEvent)">{{detailBtn}}</button>&nbsp;&nbsp;
+				</div>
+
+</div>
 
 
 <!-- 防损管理首页 -->
@@ -123,7 +177,7 @@
 
 			<ul class="mui-table-view"
 				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
-				<li v-for="item in selectedEvents.slice(0, 3)" class="mui-table-view-cell mui-media"><a
+				<li v-for="item in selectedEvents.slice(0, 3)" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
 					href="javascript:;"> <img
 						class="mui-media-object mui-pull-left"
 						src="http://placehold.it/40x30"></img>
@@ -164,7 +218,7 @@
 		
 		
 		<!-- !(managerPage||eventListPage) -->
-<div v-show="!(managerPage||eventListPage)" class="mui-content" style="background-color: #F8F8F8;">
+<div v-show="!(managerPage||eventListPage||detailPage)" class="mui-content" style="background-color: #F8F8F8;">
 <!-- 款台绑定页 -->
 <div class="mui-card">
 				<form class="mui-input-group">
@@ -172,10 +226,9 @@
 						<label :for="counter.id" style="line-height: 2.0;text-align: justify;">ID:{{counter.id}}名称:{{counter.name}}类型:{{counter.typeId | changeTitle}} </label>
 						<input :id="counter.id" style="font-size: 40px;line-height:0.8 ;"  :value="counter.id" type="checkbox" v-model="counterPicked"  ></input>
 					</div>
-					 <div class="mui-input-row mui-checkbox">
+					<!--  <div class="mui-input-row mui-checkbox">
 						{{counterPicked}}
-						<!-- 隐藏域 判断是否有checkbox点击 -->
-					</div>
+					</div> -->
 					<!--<div class="mui-input-row mui-checkbox mui-disabled">
 						<label>disabled checkbox</label>
 						<input name="checkbox1" type="checkbox" disabled="disabled"></input>
@@ -198,8 +251,8 @@
 <!-- vue框架 -->
 <script type="text/javascript" charset="utf-8">
 //alert(usrID)
-//const serverPath="http://localhost:8080";//本地测试用
-const serverPath="http://192.168.1.198:8080";//手机测试用
+const serverPath="http://localhost:8080";//本地测试用
+//const serverPath="http://192.168.1.198:8080";//手机测试用
 //const serverPath="http://d9ae5x.natappfree.cc";//上线后 填绝对url
 
 var usrID=document.getElementById("usrID").value;
@@ -262,6 +315,7 @@ var usrName=document.getElementById("usrName").value;
 			managerPage:true,
 			eventListPage:false,
 			counterEditPage:false,
+			detailPage:false,
 			
 			back_button:false,//左上角返回按钮是否可见
 			counterOption:false,
@@ -271,6 +325,18 @@ var usrName=document.getElementById("usrName").value;
 			userCounter:[],
 			
 			counterPicked:[],
+			
+			detailEvent:{//被点击查看详情的事件
+				
+			},
+			saveEditDisabled:true,
+			detailBtn:'保存',//详情页  按钮文字
+			detailBtnShow:true,//详情页  按钮是否显示
+			
+			disabled: false,//详情页表单是否可点击
+			
+			loadingPage:true,//页面载入动画
+			
 			
 			
 		},
@@ -322,6 +388,7 @@ var usrName=document.getElementById("usrName").value;
                     		} else {
                     		//不去关联款台
                     		
+                    		
 			                       	
 			                }
 			
@@ -360,6 +427,10 @@ var usrName=document.getElementById("usrName").value;
 				//切换显示的event数据源
 				this.selectedEvents=this.eventsStatus0
 				this.title='10';
+				//控制详情页按钮
+				this.detailBtnShow=true;
+				this.detailBtn='保存';
+				
 				console.log(this.selectedEvents.length)
 				if(this.selectedEvents.length==0){
 					this.noEventTip='没有未处置事件';
@@ -388,6 +459,11 @@ var usrName=document.getElementById("usrName").value;
 				//切换显示的event数据源
 				this.selectedEvents=this.eventsStatus1
 				this.title='11';
+				//控制详情页按钮
+				this.detailBtnShow=true;
+				this.detailBtn='提交';
+			
+			
 				console.log(this.selectedEvents.length)
 				if(this.selectedEvents.length==0){
 					this.noEventTip='没有待提交事件'
@@ -414,6 +490,11 @@ var usrName=document.getElementById("usrName").value;
 				//切换显示的event数据源
 				this.selectedEvents=this.eventsStatus2
 				this.title='12';
+				//控制详情页按钮
+				this.detailBtnShow=false;
+				this.detailBtn='';
+			
+			
 				console.log(this.selectedEvents.length)
 				if(this.selectedEvents.length==0){
 					this.noEventTip='没有已完成事件'
@@ -435,6 +516,8 @@ var usrName=document.getElementById("usrName").value;
 				this.managerPage=true;
 				this.eventListPage=false;
 				this.back_button=false;
+				this.detailPage=false;
+				//this.detailBtnShow=true;
 				//去点最后一个字符  s
 				var basic=this.title;
 				basic = basic.substr(0, basic.length - 1); 
@@ -545,6 +628,8 @@ var usrName=document.getElementById("usrName").value;
                   	if(data.status==0){
                   		mui.toast('绑定成功');
                   		//跳转到manager页面  重载event数据  和 counter数据
+                  		_self.loadEventCount();
+	                    _self.loadCounterListData();
                   		_self.back();
                   		
                   	}
@@ -558,6 +643,170 @@ var usrName=document.getElementById("usrName").value;
 				});
 				
 			},
+			toDetailPage:function(event){
+				this.detailEvent=event;
+				mui("video")[0].src = event.VideoUrl+'?'+Math.random();
+				//alert('result:'+event.comment)
+				//alert('result:'+event.id)
+				//alert("eventID："+this.detailEvent.VideoUrl)
+				console.log("titleNum:"+this.title)
+				
+				this.managerPage=false;
+				this.eventListPage=false;
+				this.detailPage=true;
+				this.back_button=true;//显示返回按钮
+				
+				//控制表单是否可编辑
+				this.disabled=!this.detailBtnShow;
+				
+				if(event.result==''){
+					mui.toast('请选择审核结论');
+				}else if(event.comment==''||event.productName==''){
+					mui.toast('请补全事件详细信息');
+				}else{
+					
+				}
+				//处理标题
+				this.title='14s';
+				
+			},	
+			saveEditResult:function(event){
+				var _self=this;
+				//前台数据校验
+				switch(this.detailBtn){
+				
+				case "保存":
+					
+					event.status='暂存';
+					if(event.result.length!=0){
+						//前台打印修改的结果
+						console.log("---保存编辑结果---"+"/n id:"+event.id+"/n comment:"+event.comment+"/n productName:"+event.productName+"/n money:"+event.money
+								+"/n result:"+event.result+"/n status:"+event.status)
+						
+						
+						
+						mui.ajax({//向服务器获取款台数据
+							url : serverPath+"/saveEditResult",
+		                    type : 'post',
+		                    headers: {
+		                       'Content-Type': 'application/x-www-form-urlencoded'
+		                  },
+		                    data : { 
+		                    	id:event.id,
+		                    	comment:event.comment,
+		                    	productName:event.productName,
+		                    	money:event.money,
+		                    	result:event.result,
+		                    	status:event.status,
+		                    }, 
+		                    timeout : 10000,
+		                    success : function(data){
+		                    	if(data.status==0){
+		                      		mui.toast('保存成功');
+		                      		//跳转到manager页面  重载event数据  和 counter数据
+		                      		_self.loadEventCount();
+		                      		_self.loadCounterListData();
+		                      		_self.back();
+		                      		
+		                      	}
+		                    },
+		                    error : function(xhr,type,errorThrown){
+		                        console.log(xhr);
+		                        console.log(type);
+		                        console.log(errorThrown);
+		                    }
+						});
+
+					}else{
+						mui.toast('审核结论不能为空');
+					}
+					
+					break;
+					
+				case "提交":
+					/* console.log("empty:"+event.comment.replace(/(^s*)|(s*$)/g, "").length)
+					
+					event.comment=event.comment.replace(/(^\s*)/g, "");
+					event.productName=event.comment.replace(/(^\s*)/g, "");
+					
+					console.log("empty later:"+event.comment.replace(/(^s*)|(s*$)/g, "").length) */
+					
+					event.status='完成';
+					//alert(event.comment);
+					//event.comment='testetst';
+					
+					//alert(mui("#save_commet")[0].value());
+					
+					//return;
+					
+					//alert(event.comment+"+"+event.productName)
+					if(event.comment.length!=0&&event.productName.length!=0){
+						//前台打印修改的结果
+						console.log("---保存编辑结果---"+"/n id:"+event.id+"/n comment:"+event.comment+"/n productName:"+event.productName+"/n money:"+event.money
+								+"/n result:"+event.result+"/n status:"+event.status)
+						
+						
+						
+						mui.ajax({//向服务器获取款台数据
+							url : serverPath+"/saveEditResult",
+		                    type : 'post',
+		                    headers: {
+		                       'Content-Type': 'application/x-www-form-urlencoded'
+		                  },
+		                    data : { 
+		                    	id:event.id,
+		                    	comment:event.comment,
+		                    	productName:event.productName,
+		                    	money:event.money,
+		                    	result:event.result,
+		                    	status:event.status,
+		                    }, 
+		                    timeout : 10000,
+		                    success : function(data){
+		                    	if(data.status==0){
+		                      		mui.toast('提交成功');
+		                      		//跳转到manager页面  重载event数据  和 counter数据
+		                      		_self.loadEventCount();
+		                      		_self.loadCounterListData();
+		                      		_self.back();
+		                      		
+		                      	}
+		                    },
+		                    error : function(xhr,type,errorThrown){
+		                        console.log(xhr);
+		                        console.log(type);
+		                        console.log(errorThrown);
+		                    }
+						});
+
+					}else{
+						mui.toast('补全所有信息才能提交喔');
+					}
+					
+					
+					break;
+					
+				default:
+					
+					break;
+				
+				
+				}
+				
+					
+					
+				
+				
+				
+								
+			},
+			watchEditChange:function(){
+				if(this.detailEvent.result.length!=0){
+					this.saveEditDisabled=true;
+				}
+			}
+			
+			
 			
 
 		},
@@ -576,31 +825,48 @@ var usrName=document.getElementById("usrName").value;
 			this.loadEventCount();
 			this.loadCounterListData();
 			
+			this.loadingPage=false;
+			
 			
 			//alert('load success'+this.usrID)
 		},
+		beforeCreate: function () {
+            console.group('beforeCreate 创建前状态===============》');
+           //alert("页面正在载入中....") ;
+    	},
 		filters: {//过滤器
 			  getLength: function (value) {
 			    return value.length
 			  },
 			  changeTitle:function(value){//字符串 过滤处理器 根据需要配置
 				  
-					  if(value==='1'||value==='10'||value==='11'||value==='12'){
+					  if(value==='1'||value==='10'||value==='11'||value==='12'||value==='14'){
+						  this.detailBtnShow=true;
 						  return '防损事件管理';
 					  }
 				  
 					  if(value==='10s'){
 						  //console.log(back_button)
+						  this.detailBtnShow=true;
+						  this.detailBtn="保存";
 						  return '未处理事件列表';
 					  }
 					  if(value==='11s'){
+						  this.detailBtnShow=true;
+						  this.detailBtn="提交";
 						  return '暂存事件列表';
 					  }
 					  if(value==='12s'){
+						  this.detailBtnShow=false;
 						  return '完成事件列表';
 					  }
 					  if(value==='13s'){
+						  this.detailBtnShow=true;
 						  return '款台列表';
+					  }
+					  if(value==='14s'){
+						  this.detailBtnShow=true;
+						  return '事件详情';
 					  }
 					  if(value==0){
 						  return '传统银台';

@@ -21,7 +21,7 @@
 	<select id="selectEventThisMonth" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money, e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN 
 		shops s ON c.shopId=s.id LEFT JOIN areas a 
  		ON s.areaId=a.id  where s.areaId=#{areaID} and 
@@ -33,7 +33,7 @@
 	<select id="selectEventThisWeek" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money, e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN 
 		shops s ON c.shopId=s.id LEFT JOIN areas a 
  		ON s.areaId=a.id  where s.areaId=#{areaID} and YEARWEEK(date_format(e.date,'%Y-%m-%d'))
@@ -45,7 +45,7 @@
 	<select id="selectEventThisDay" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money, e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN 
 		shops s ON c.shopId=s.id LEFT JOIN areas a 
  		ON s.areaId=a.id   where s.areaId=#{areaID} and to_days(e.date)
@@ -57,7 +57,7 @@
 	<select id="selectEventByStatus" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN 
 		shops s ON c.shopId=s.id LEFT JOIN areas a 
  		ON s.areaId=a.id  where s.areaId=#{areaID} and e.status=#{status}
@@ -70,7 +70,7 @@
 	<select id="selectEventThisMonth2" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-        SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+        SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN shops
          s ON c.shopId=s.id   where c.shopID=#{shopID} and 
  		date_format(e.date,'%Y-%m')=date_format(now(),'%Y-%m')
@@ -81,7 +81,7 @@
 	<select id="selectEventThisWeek2" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN shops
          s ON c.shopId=s.id   where c.shopID=#{shopID} and YEARWEEK(date_format(e.date,'%Y-%m-%d'))
  		 =YEARWEEK(now())
@@ -92,7 +92,7 @@
 	<select id="selectEventThisDay2" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN shops
          s ON c.shopId=s.id   where c.shopID=#{shopID} and to_days(e.date)
  		 =to_days(now()) 
@@ -103,7 +103,7 @@
 	<select id="selectEventByStatus2" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
 		,c.name as counterName from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN shops
          s ON c.shopId=s.id   where c.shopID=#{shopID} and e.status=#{status}
  		
@@ -115,7 +115,7 @@
 	<select id="selectEventThisMonth3" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-        SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+        SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
  c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and 
  		date_format(e.date,'%Y-%m')=date_format(now(),'%Y-%m')
@@ -126,7 +126,7 @@
 	<select id="selectEventThisWeek3" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
  c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and YEARWEEK(date_format(e.date,'%Y-%m-%d'))
  		 =YEARWEEK(now())
@@ -137,7 +137,7 @@
 	<select id="selectEventThisDay3" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') date,e.TransID
 		,c.name as counterName from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
  c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and to_days(e.date)
  		 =to_days(now()) 
@@ -148,12 +148,27 @@
 	<select id="selectEventByStatus3" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
-         SELECT e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
+         SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
 		,c.name as counterName from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
  c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status}
  		
 
 	</select>
+	
+	<update id="updateById">
+	
+			UPDATE events
+				 <trim prefix="set" suffixOverrides=",">
+				  <if test="comment !=null">comment=#{comment},</if>
+				  <if test="productName !=null">productName=#{productName},</if>
+				  <if test="money !=null">money=#{money},</if>
+				  <if test="result !=null">result=#{result},</if>
+				  <if test="status !=null">status=#{status},</if>
+				 </trim>
+		 WHERE id=#{id}
+	
+	
+	</update>
 	
 
 

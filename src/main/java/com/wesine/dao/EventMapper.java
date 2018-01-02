@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface EventMapper {
@@ -37,6 +38,9 @@ public interface EventMapper {
 	List<Map<String,Object>> selectEventThisDay3(Map<String, Object> conditionMap);
 
 	List<Map<String,Object>> selectEventByStatus3(Map<String, Object> conditionMap);
+
+	
+	int updateById(Map<String, Object> conditionMap);
 
 	
 	

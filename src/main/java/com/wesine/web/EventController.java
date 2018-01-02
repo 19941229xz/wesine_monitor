@@ -1,5 +1,6 @@
 package com.wesine.web;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,5 +98,41 @@ public class EventController {
 
 		return resultMap;
 	}
+	
+	
+	@RequestMapping(value="saveEditResult",method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> saveEditResult(String id,String comment,String productName,String money,String result,String status){
+		resultMap = new HashMap<String, Object>();
+		
+		conditionMap = new HashMap<String, Object>();
+		
+		conditionMap.put("id", id);
+		conditionMap.put("comment", comment==null?"":comment);
+		conditionMap.put("productName", productName==null?"":productName);
+		//System.out.println(money);
+		conditionMap.put("money", money==null||money.equals("")?0:new BigDecimal(money));
+		conditionMap.put("result", result);
+		conditionMap.put("status", status);
+		
+		
+		int num=eventMapper.updateById(conditionMap);
+		
+		if(num>=1){
+			resultMap.put("status", 0);
+			resultMap.put("tip", "成功");
+		}else{
+			resultMap.put("status", 1);
+			resultMap.put("tip", "失败");
+		}
+		
+		
+		return resultMap;
+		
+		
+		
+	}
+	
+	
 
 }
