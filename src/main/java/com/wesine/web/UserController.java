@@ -59,7 +59,7 @@ public class UserController {
 	// http://121.201.13.217:27002/api/v1/wmHomePage/3？usrID=0100201&usrName=李四&shopID=1001
 
 	// 物美登陆
-	@RequestMapping(value = "api/v1/wmHomePage/{judgeNum}")
+	@RequestMapping(value = "api/v1/wmHomePage/{judgeNum}") 
 	public void indexHtml(HttpServletResponse response,HttpServletRequest request,Map<String, Object> map, @PathVariable String judgeNum, String usrID, String usrName,
 			String shopID,String areaID) throws IOException {
 //		System.out.println(usrID);
