@@ -115,7 +115,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <maimClass>com.hhly.InformationApplication</maimClass>
+                    <maimClass>com.wesine.WesineMonitorApplication</maimClass>
                 </configuration>
                 <executions>
                     <execution>

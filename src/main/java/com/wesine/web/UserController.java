@@ -110,8 +110,13 @@ public class UserController {
 		map.put("usrName", usrName);
 		
 		
-		response.sendRedirect("http://localhost:8080/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
-		+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID"));
+		System.out.println(request.getServerName()+":"+request.getServerPort());
+		
+		String serverPath="http://"+request.getServerName()+":"+request.getServerPort();
+		
+		response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+		+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
+		+"&serverPath="+serverPath);
 	}
 	
 	
