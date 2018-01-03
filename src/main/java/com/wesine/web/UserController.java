@@ -60,8 +60,8 @@ public class UserController {
 
 	// 物美登陆
 	@RequestMapping(value = "api/v1/wmHomePage/{judgeNum}")
-	public String indexHtml(Map<String, Object> map, @PathVariable String judgeNum, String usrID, String usrName,
-			String shopID,String areaID) {
+	public void indexHtml(HttpServletResponse response,HttpServletRequest request,Map<String, Object> map, @PathVariable String judgeNum, String usrID, String usrName,
+			String shopID,String areaID) throws IOException {
 //		System.out.println(usrID);
 		conditionMap=new HashMap<String,Object>();
 
@@ -109,9 +109,9 @@ public class UserController {
 		map.put("usrID", usrID);
 		map.put("usrName", usrName);
 		
-
 		
-		return "index";
+		response.sendRedirect("http://localhost:8080/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+		+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID"));
 	}
 	
 	
