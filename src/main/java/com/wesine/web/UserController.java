@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import com.wesine.dao.CounterMapper;
 import com.wesine.dao.UserMapper;
 import com.wesine.model.User;
 
@@ -31,6 +32,9 @@ public class UserController {
 
 	@Autowired
 	UserMapper userMapper;
+	
+	@Autowired
+	CounterMapper counterMapper;
 
 	@RequestMapping(value = "/users")
 	@ResponseBody
@@ -64,11 +68,16 @@ public class UserController {
 			String shopID,String areaID) throws IOException {
 //		System.out.println(usrID);
 		conditionMap=new HashMap<String,Object>();
+		
+		map.put("status", "0");//正常登陆
+		
+		String roleId="";
 
 		switch (judgeNum) {
 		case "2":
 			// 防损员
 			map.put("roleId", 1);
+			roleId="1";
 			conditionMap.put("roleId", "1");
 			map.put("shopID", shopID);
 			System.out.println("----登陆操作----\n"+"usrID："+usrID+"\n身份:防损员"+"\n姓名:"+usrName+"\nshopID:"+shopID+"\n----end----");
@@ -76,6 +85,7 @@ public class UserController {
 		case "3":
 			// 防损经理
 			map.put("roleId", 2);
+			roleId="2";
 			conditionMap.put("roleId", "2");
 			map.put("shopID", shopID);
 			System.out.println("----登陆操作----\n"+"usrID："+usrID+"\n身份:防损经理"+"\n姓名:"+usrName+"\nshopID:"+shopID+"\n----end----");
@@ -83,6 +93,7 @@ public class UserController {
 		case "4":
 			// 区域经理
 			map.put("roleId", 3);
+			roleId="3";
 			conditionMap.put("roleId", "3");
 			map.put("areaID", areaID);
 			System.out.println("----登陆操作----\n"+"usrID："+usrID+"\n身份:区域经理"+"\n姓名:"+usrName+"\nareaID:"+areaID+"\n----end----");
@@ -104,7 +115,13 @@ public class UserController {
 			userMapper.insert(conditionMap);
 			System.out.println("------新注册一名防损人员：usrID:"+usrID+"\tusrName:"
 			+usrName+"\tcompanyId:"+conditionMap.get("companyId")+"-----");
+			
 		}
+		
+		if(roleId.equals("1")&&counterMapper.countUserCounter(usrID)==0){//if roleId =0 is 防损员  查询是否关联款台
+			map.put("status", "2");//2 防损员登陆  未关联款台
+		}
+		
 		
 		map.put("usrID", usrID);
 		map.put("usrName", usrName);
@@ -114,9 +131,17 @@ public class UserController {
 		
 		String serverPath="http://"+request.getServerName()+":"+request.getServerPort();
 		
-		response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
-		+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
-		+"&serverPath="+serverPath);
+		if(map.get("roleId").equals(3)){//通过roleId判断角色  为3时为区域经理  跳转到index2
+			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index2.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+			+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
+			+"&serverPath="+serverPath);
+		}else{
+			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+			+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
+			+"&serverPath="+serverPath+"&status="+map.get("status"));
+		}
+		
+		
 	}
 	
 	

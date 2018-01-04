@@ -71,7 +71,9 @@ public class TransDataController {
 				eventMap.put("PictureUrl0", billList.get(i).get("PictureUrl0"));
 				eventMap.put("VideoUrl", billList.get(i).get("VideoUrl"));
 				// 时间戳 处理为date时间
-				eventMap.put("date", TimeUtil.stampToDate(dataMap.get("TsStart") + ""));
+				
+				eventMap.put("date", TimeUtil.stampToDate(dataMap.get("TsStart")+""));
+				//System.out.println(TimeUtil.stampToDate(dataMap.get("TsStart")+""));
 
 				listMap.add(eventMap);
 			}

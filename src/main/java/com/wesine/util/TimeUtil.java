@@ -11,8 +11,10 @@ public class TimeUtil {
 	public static Date stampToDate(String s) {
 		String res;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		long lt = new Long(s);
+		Long lt = Long.parseLong(s);
+		//System.out.println(lt);
 		Date date = new Date(lt);
+		//System.out.println(date);
 //		res = simpleDateFormat.format(date);
 		return date;
 	}

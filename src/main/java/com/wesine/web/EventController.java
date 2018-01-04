@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wesine.dao.EventMapper;
 import com.wesine.dao.UserMapper;
+import com.wesine.service.EventService;
 
 @Controller
 public class EventController {
@@ -26,6 +27,10 @@ public class EventController {
 	EventMapper eventMapper;
 	@Autowired
 	UserMapper userMapper;
+	
+	@Autowired
+	EventService eventService;
+	
 
 	@RequestMapping(value = "/getEventData")//,method = RequestMethod.POST
 	@ResponseBody
@@ -51,7 +56,7 @@ public class EventController {
 			
 			conditionMap.put("usrID", usrID);
 			resultMap.put("eventsForThisMonth", eventMapper.selectEventThisMonth3(conditionMap));
-			resultMap.put("eventsForThisWeek", eventMapper.selectEventThisWeek3(conditionMap));
+			resultMap.put("eventsForThisWeek", eventService.getEvenArrThisWeek3(areaID));//
 			resultMap.put("eventsForThisDay", eventMapper.selectEventThisDay3(conditionMap));
 			//status  0 未处理  1暂存  2完成
 			conditionMap.put("status", "未处理");
@@ -66,7 +71,7 @@ public class EventController {
 			// 判读 这是防损经理
 			conditionMap.put("shopID", shopID);
 			resultMap.put("eventsForThisMonth", eventMapper.selectEventThisMonth2(conditionMap));
-			resultMap.put("eventsForThisWeek", eventMapper.selectEventThisWeek2(conditionMap));
+			resultMap.put("eventsForThisWeek", eventService.getEvenArrThisWeek2(areaID));//
 			resultMap.put("eventsForThisDay", eventMapper.selectEventThisDay2(conditionMap));
 			//status  0 未处理  1暂存  2完成
 			conditionMap.put("status", "未处理");
@@ -80,9 +85,9 @@ public class EventController {
 		case "3":
 			// 判读 这是区域经理
 			conditionMap.put("areaID", areaID);
-			resultMap.put("eventsForThisMonth", eventMapper.selectEventThisMonth(conditionMap));
-			resultMap.put("eventsForThisWeek", eventMapper.selectEventThisWeek(conditionMap));
-			resultMap.put("eventsForThisDay", eventMapper.selectEventThisDay(conditionMap));
+			resultMap.put("eventsForThisMonth", eventService.getEvenArrThisMonth(areaID));
+			resultMap.put("eventsForThisWeek", eventService.getEvenArrThisWeek(areaID));//
+			resultMap.put("eventsForThisDay", eventService.getEvenArrThisDay(areaID));
 			//status  0 未处理  1暂存  2完成
 			conditionMap.put("status", "未处理");
 			resultMap.put("eventsStatus0", eventMapper.selectEventByStatus(conditionMap));

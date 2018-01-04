@@ -11,39 +11,38 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface EventMapper {
 
-	
-	
 	int insertEventForMany(List<Map<String, Object>> listMap);
 
-	List<Map<String,Object>> selectEventThisMonth(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisMonth(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisWeek(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisWeek(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisDay(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisDay(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventByStatus(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventByStatus(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisMonth2(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisMonth2(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisWeek2(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisWeek2(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisDay2(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisDay2(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventByStatus2(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventByStatus2(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisWeek3(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisWeek3(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisMonth3(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisMonth3(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventThisDay3(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventThisDay3(Map<String, Object> conditionMap);
 
-	List<Map<String,Object>> selectEventByStatus3(Map<String, Object> conditionMap);
+	List<Map<String, Object>> selectEventByStatus3(Map<String, Object> conditionMap);
 
-	
 	int updateById(Map<String, Object> conditionMap);
 
-	
-	
-	
-	
+	int countEventThisDay(Map<String, Object> conditionMap);
+
+	int countEventThisDay2(Map<String, Object> conditionMap);
+
+	int countEventThisHour(Map<String, Object> conditionMap);
+
 }
