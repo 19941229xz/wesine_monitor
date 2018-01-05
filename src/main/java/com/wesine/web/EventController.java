@@ -88,6 +88,9 @@ public class EventController {
 			resultMap.put("eventsForThisMonth", eventService.getEvenArrThisMonth(areaID));
 			resultMap.put("eventsForThisWeek", eventService.getEvenArrThisWeek(areaID));//
 			resultMap.put("eventsForThisDay", eventService.getEvenArrThisDay(areaID));
+			//差错图数据
+			resultMap.put("eventPercentGraphData", eventService.getEvenPercentArr(areaID));
+			
 			//status  0 未处理  1暂存  2完成
 			conditionMap.put("status", "未处理");
 			resultMap.put("eventsStatus0", eventMapper.selectEventByStatus(conditionMap));

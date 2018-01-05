@@ -44,5 +44,19 @@ public interface EventMapper {
 	int countEventThisDay2(Map<String, Object> conditionMap);
 
 	int countEventThisHour(Map<String, Object> conditionMap);
+	
+	@Select("select max(allEventNum) from eventAnalysi")
+	int getAllEventNum();//查询最大事件数
+	
+	@Insert("insert into eventAnalysi (allEventNum,unNormalEventNum,incorrectPercent)values(#{i},#{j},#{parseDouble})")
+	void insertNewEventAnlysidata(Map<String, Object> eventMapForAnalysi);
+	
+	@Select("select max(unNormalEventNum) from eventAnalysi")
+	int getAllEventNumIncorrect();//查询最大不支持事件数
+
+	@Select("select count(allEventNum) from eventAnalysi")
+	int countEvenPercent();
+	@Select("select allEventNum,incorrectPercent from eventAnalysi")
+	List<Map<String, Object>> selectEvenPercentList();
 
 }

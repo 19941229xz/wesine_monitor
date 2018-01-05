@@ -19,7 +19,47 @@
 .mui-toast-container {bottom: 50% !important;}
 .mui-toast-message {opacity: 0.6; color: #fff; width: 250px; padding: 10px 5px 10px 5px;font-size:20px;}
 
+/*mui css */
+.mui-card .mui-control-content {
+				padding: 10px;
+			}
+			
+.mui-control-content {
+				height: 150px;
+			}
+.mui-segmented-control .mui-control-item.mui-active {
+    color: white;
+    background-color: #5D9CEC;
+}
+.mui-segmented-control .mui-control-item{
+border-color: #5D9CEC;
+}
 
+/*  表格css */
+.table {
+				border: 1px solid #cad9ea;
+				color: #666;
+				
+			}
+			
+			.table th {
+				background-repeat: repeat-x;
+				height: 30px;
+			}
+			
+			.table td,
+			.table th {
+				border: 1px solid #cad9ea;
+				padding: 0 1em 0;
+				font-size:10px;
+			}
+			
+			.table tr.alter {
+				background-color: #f5fafe;
+			}
+			.table td{
+				text-align: center;
+			}
 
 </style>
 
@@ -55,7 +95,7 @@
 
 <!-- 防损管理首页 -->
 		<div v-show="managerPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
-		
+		<center><h4>本日状况</h4></center>
 		
 			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
 				style="background-color: #F8F8F8;">
@@ -75,8 +115,124 @@
 
 			<div id="eventChart" style="height: 250px;width:100%"></div>
 			
-			<div id="percentChart" style="height: 250px;width:100%"></div>
-
+			<div id="echarts-scatter-chart" style="height: 250px;width:100%"></div>
+			
+			
+			<!-- 收银员  防损员  情况  start -->
+			
+			<div style="padding: 10px 10px;">
+				<div id="segmentedControl" class="mui-segmented-control">
+					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >收银员</a>
+					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">防损员</a>
+				</div>
+				<div id="segmentedControl" class="mui-segmented-control" style="margin-top: 10px;">
+					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >本周</a>
+					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">本月</a>
+					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >近三个月</a>
+					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">近半年</a>
+				</div>
+			</div>
+			<div>
+				<div id="" :class="{'mui-active': isSyyCard}" class="mui-control-content">
+					<div id="scroll" class="mui-scroll-wrapper">
+						<div class="mui-scroll">
+							<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
+								<tr>
+									<th width=25%>收银员</th>
+									<th width=25%>收银次数</th>
+									<th width=25%>事件次数</th>
+									<th width=25%>出错率</th>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+								</tr>
+							</table>
+							
+						</div>
+					</div>
+				</div>
+				<div id="" :class="{'mui-active': isFsyCard}" class="mui-control-content">
+					<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
+								<tr>
+									<th width=20%>防损员</th>
+									<th width=20%>事件次数</th>
+									<th width=20%>三分钟内</th>
+									<th width=20%>五分钟内</th>
+									<th width=20%>五分钟以上</th>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+								<tr>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td> 
+									<td>12</td>
+									<td>12</td>
+								</tr>
+							</table>
+				</div>
+				
+			</div>
+			
+			<!-- end -->
+						<!-- 收银员饼状图 -->
+							<div id="echarts-pie-chart-syy" v-show="pieSyy" style="height: 250px;width:100%;margin-top: 10px;"></div>
+							<!-- 防损员饼状图 -->
+							<div id="echarts-pie-chart-fsy" v-show="pieFsy" style="height: 250px;width:100%;margin-top: 10px;"></div>
 
 		</div>
 		
@@ -149,6 +305,8 @@ var usrName=getQueryString("usrName");
 			eventsForThisMonth:[],//按月统计
 			eventClzNum:0,//处理中事件件数
 			
+			eventPercentGraphData:[],//差错图数据
+			
 			
 			
 			selectedEvents:[],//当前要显示的事件
@@ -174,6 +332,23 @@ var usrName=getQueryString("usrName");
 			wcpObj:{
 				color: '',
 			},
+			
+			
+			
+			syyObj:{//收银员 选项卡样式
+				color: 'white',
+			    background:'#5D9CEC'
+			},
+			fsyObj:{//防损员 选项卡样式
+				color: '',
+			    background:'#F1F1F1'
+			},
+			isFsyCard:false,//是否显示防损员表格
+			isSyyCard:true,//是否显示收银员表格
+			pieSyy:true,//是否显示收银员饼图
+			pieFsy:false,//是否显示防损员饼图
+			
+			
 			
 			
 			isEventListShow:true,
@@ -237,9 +412,13 @@ var usrName=getQueryString("usrName");
                         _self.eventsStatus0=data.eventsStatus0;
                     	_self.eventsStatus1=data.eventsStatus1;
                     	_self.eventsStatus2=data.eventsStatus2;
+                    	//图标  按时间统计数据
                     	_self.eventsForThisWeek=data.eventsForThisWeek;
                     	_self.eventsForThisDay=data.eventsForThisDay;
                     	_self.eventsForThisMonth=data.eventsForThisMonth;
+                    	//差错图数据
+                    	_self.eventPercentGraphData=data.eventPercentGraphData;
+                    	
                     	//计算处理中事件件数
                     	_self.eventClzNum=data.eventsStatus0.length+data.eventsStatus1.length;
                     	//登陆页面后 默认先加载未处理事件
@@ -377,6 +556,35 @@ var usrName=getQueryString("usrName");
 					this.isEventListShow=true;
 					this.isNoEventShow=false;
 				}
+			},
+			toFsyCard:function(){//切换到防损员选项卡
+				
+				this.syyObj.color='';
+				this.syyObj.background='#F1F1F1';
+				
+				this.fsyObj.color='white';
+				this.fsyObj.background='#5D9CEC';
+				
+				this.isFsyCard=true;
+				this.isSyyCard=false;
+				
+				this.pieSyy=false;
+				this.pieFsy=true;
+				
+				
+			},
+			toSyyCard:function(){//切换到收银员选项卡
+				this.fsyObj.color='';
+				this.fsyObj.background='#F1F1F1';
+				
+				this.syyObj.color='white';
+				this.syyObj.background='#5D9CEC';
+				
+				this.isFsyCard=false;
+				this.isSyyCard=true;
+				
+				this.pieSyy=true;
+				this.pieFsy=false;
 			},
 			getMoreEvent:function(){
 				console.log("selectedEvent:"+this.selectedEvents.length)
@@ -723,7 +931,7 @@ var usrName=getQueryString("usrName");
 				  
 					  if(value==='1'||value==='10'||value==='11'||value==='12'||value==='14'){
 						  this.detailBtnShow=true;
-						  return '防损事件管理';
+						  return '防损系统管理';
 					  }
 				  
 					  if(value==='10s'){
@@ -743,7 +951,7 @@ var usrName=getQueryString("usrName");
 					  }
 					  if(value==='13s'){
 						  this.detailBtnShow=true;
-						  return '款台列表';
+						  return '门店列表';
 					  }
 					  if(value==='14s'){
 						  this.detailBtnShow=true;
@@ -797,7 +1005,7 @@ var usrName=getQueryString("usrName");
 			trigger : 'axis'
 		},
 		legend : {
-			data : [ '邮件营销' ],
+			data : [ '防损事件' ],
 			show : false
 		},
 		grid : {
@@ -813,7 +1021,7 @@ var usrName=getQueryString("usrName");
 				myTool1 : {
 					show : true,
 					title : '按月统计',
-					icon : 'image://http://localhost:8080/static/img/月.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/月.svg',
 					onclick : function() {
 						//							alert('myToolHandler1')
 						option.series[0].data=app.eventsForThisMonth;
@@ -838,7 +1046,7 @@ var usrName=getQueryString("usrName");
 				myTool2 : {
 					show : true,
 					title : '按周统计',
-					icon : 'image://http://localhost:8080/static/img/周.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/周.svg',
 					onclick : function() {
 						//							alert('myToolHandler2')
 						option.series[0].data=app.eventsForThisWeek;
@@ -849,7 +1057,7 @@ var usrName=getQueryString("usrName");
 				myTool3 : {
 					show : true,
 					title : '按日统计',
-					icon : 'image://http://localhost:8080/static/img/日.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/日.svg',
 					onclick : function() {
 						//							alert('按日统计')
 						option.series[0].data=app.eventsForThisDay;
@@ -868,9 +1076,15 @@ var usrName=getQueryString("usrName");
 			boundaryGap : false,
 			data : [ '周一', '周二', '周三', '周四', '周五', '周六', '周日' ]
 		},
-		yAxis : {
-			type : 'value'
-		},
+		yAxis : [
+	        {
+	            type : 'value',
+	            scale:true,
+	            axisLabel : {
+	                formatter: '{value} 次'
+	            }
+	        }
+	    ],
 		series : [ {
 			name : '防损事件',
 			type : 'line',
@@ -923,6 +1137,193 @@ var usrName=getQueryString("usrName");
 
 
 
+<script type="text/javascript" charset="utf-8">
+var scatterChart = echarts.init(document.getElementById("echarts-scatter-chart"));
+var scatteroption = {
+    title : {
+    	text : '差错率',
+		show : true,
+		textStyle : {
+			fontWeight : 'normal',
+			fontSize : 15,
+		}
+    },
+    tooltip : {
+        trigger: 'axis',
+        showDelay : 0,
+        axisPointer:{
+            type : 'cross',
+            lineStyle: {
+                type : 'dashed',
+                width : 1
+            }
+        }
+    },
+    legend: {
+       
+    },
+    grid:{
+        x:45,
+        x2:40,
+        y2:24
+    },
+    xAxis : [
+        {
+            type : 'value',
+            scale:false, 
+           axisLabel : {
+                formatter: '{value}'
+            }  
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            scale:true,
+            axisLabel : {
+                formatter: '{value} %'
+            }
+        }
+    ],
+    series : [
+        {
+            name:'差错率',
+            type:'scatter',
+            tooltip : {
+                trigger: 'item',
+                formatter : function (params) {
+                    if (params.value.length > 1) {
+                        return params.seriesName + ' :<br/>'
+                           + params.value[0] + '件 '
+                           + params.value[1] + '% ';
+                    }
+                    else {
+                        return params.seriesName + ' :<br/>'
+                           + params.name + ' : '
+                           + params.value + '% ';
+                    }
+                }
+            },
+            data: [[174, 65.6], [18700000, 78.8]
+            ],
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+
+
+	 var t;//一个bug暂时这么解决一下
+		t = setTimeout(function (){
+			scatteroption.series[0].data=app.eventPercentGraphData;
+			scatterChart.setOption(scatteroption);
+		}, 1000);
+
+</script>
+
+<script type="text/javascript">
+
+var obj=document.getElementById("echarts-pie-chart-syy")
+
+obj.style.width = window.innerWidth+'px';
+obj.style.height = obj.parentNode.innerHeight+'px';
+
+var pieChart_syy = echarts.init(obj);
+var pieoption_syy = {
+    title : {
+        text: '防损事件占比',
+        subtext: '',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        orient : 'vertical',
+        x : 'left',
+        data:['正常事件','防损事件']
+    },
+    calculable : true,
+    series : [
+        {
+            name:'访问来源',
+            type:'pie',
+            radius : '55%',
+            center: ['50%', '60%'],
+            data:[
+                {value:335, name:'正常事件'},
+                {value:310, name:'防损事件'},
+                /* {value:310, name:'邮件营销'},
+                {value:234, name:'联盟广告'},
+                {value:135, name:'视频广告'},
+                {value:1548, name:'搜索引擎'} */
+            ]
+        }
+    ]
+};
+pieChart_syy.setOption(pieoption_syy);
+
+
+</script>
+
+<script type="text/javascript">
+var obj=document.getElementById("echarts-pie-chart-fsy")
+
+obj.style.width = window.innerWidth+'px';
+obj.style.height = obj.parentNode.innerHeight+'px';
+
+var pieChart_fsy = echarts.init(obj);
+var pieoption_fsy = {
+    title : {
+        text: '事件结果分布',
+        subtext: '',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        orient : 'vertical',
+        x : 'left',
+        data:['漏扫事件','补扫事件']
+    },
+    calculable : true,
+    series : [
+        {
+            name:'访问来源',
+            type:'pie',
+            radius : '55%',
+            center: ['50%', '60%'],
+            data:[
+                {value:335, name:'漏扫事件'},
+                {value:220, name:'补扫事件'},
+                /* {value:310, name:'邮件营销'},
+                {value:234, name:'联盟广告'},
+                {value:135, name:'视频广告'},
+                {value:1548, name:'搜索引擎'} */
+            ]
+        }
+    ]
+};
+
+	
+
+pieChart_fsy.setOption(pieoption_fsy);
+
+
+</script>
 
 
 

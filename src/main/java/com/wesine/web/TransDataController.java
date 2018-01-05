@@ -1,5 +1,6 @@
 package com.wesine.web;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,8 @@ public class TransDataController {
 	private List<Map<String, Object>> listMap;
 
 	private Map<String, Object> eventMap;
+	
+	private Map<String, Object> eventMapForAnalysi;
 
 	@RequestMapping(value = "/TransData", method = RequestMethod.PUT)
 	@ResponseBody
@@ -81,8 +84,58 @@ public class TransDataController {
 
 		eventMapper.insertEventForMany(listMap);
 		
+		
 		System.out.println("-----"+TimeUtil.stampToDateString(dataMap.get("TsStart") + "")+"-----\n本次交易单号："+dataMap.get("TransID")+"\n本次购物共扫描"+billList.size()+"商品！\n"+"不正常扫描事件次数："+listMap.size()+"\n----end----");
-
+		
+		int allEventNum=eventMapper.getAllEventNum();//数据库中获取事件总次数
+		int allEventNumIncorrect=eventMapper.getAllEventNumIncorrect();//数据库中获取不正常事件总次数
+		
+		//临时增加的总事件次数  达到一千就累加到数据库中  并计算差错率
+		if(redisService.exists("tempAddEventNum")&&redisService.exists("tempAddEventNumIncorrect")){
+			System.out.println("---事务：累积计算事件差错率-start----");
+			int tempNum=(int)redisService.get("tempAddEventNum");
+			int tempNumIncorrect=(int)redisService.get("tempAddEventNumIncorrect");
+			System.out.println("旧的临时事件次数："+tempNum);
+			redisService.remove("tempAddEventNum");//删除旧的临时数据
+			redisService.remove("tempAddEventNumIncorrect");//删除旧的临时数据
+			redisService.set("tempAddEventNum", tempNum+billList.size());
+			redisService.set("tempAddEventNumIncorrect", tempNumIncorrect+listMap.size());
+			System.out.println("此次数据处理后："+"临时事件总数："+(tempNum+billList.size())+",临时错误事件总数："+(tempNumIncorrect+listMap.size())
+			+"\n redis缓存已刷新！\n-----end-----");
+			if(tempNum+billList.size()>1000){
+				//计算差错率  获取百分数
+				NumberFormat numberFormat = NumberFormat.getInstance(); 
+				numberFormat.setMaximumFractionDigits(2);
+				
+				String result = numberFormat.format((float) (allEventNumIncorrect+tempNumIncorrect+listMap.size()) / (float) (allEventNum+tempNum+billList.size()) * 100);
+				
+				//再次清空临时值 并执行数据库  计算差错率  和持久化
+				eventMapForAnalysi = new HashMap<String, Object>();
+				eventMapForAnalysi.put("i", allEventNum+tempNum+billList.size());
+				eventMapForAnalysi.put("j", allEventNumIncorrect+tempNumIncorrect+listMap.size());
+				eventMapForAnalysi.put("parseDouble", Double.parseDouble(result));
+				eventMapper.insertNewEventAnlysidata(eventMapForAnalysi);
+				System.out.println("临时事件累计到一千次  已持久化到数据库中\n"+(allEventNumIncorrect+tempNumIncorrect+listMap.size())+"/"+(allEventNum+tempNum+billList.size())+
+						"="+result+"%");
+				redisService.set("tempAddEventNum", 0);
+				redisService.set("tempAddEventNumIncorrect", 0);
+				System.out.println("redis 事件缓存数据已经清零！\n-----end-----");
+			}
+		}else {
+			if(!redisService.exists("tempAddEventNum")){//判断tempAddEventNum是否redis中存在
+				System.out.println("无临时事件数据，重新生成:tempAddEventNum="+billList.size());
+				redisService.set("tempAddEventNum", billList.size());//写入缓存用set方法  
+			}
+			
+			if(!redisService.exists("tempAddEventNumIncorrect")){//判断tempAddEventNum是否redis中存在
+				System.out.println("无临时不正常事件数据，重新生成:tempAddEventNumIncorrect="+listMap.size());
+				redisService.set("tempAddEventNumIncorrect", listMap.size());
+			}
+			
+			
+		}
+		
+		
 		// redisService.set("testkey", "121111");//测试redis
 
 		// transactionMapper.insert(dataMap); //插入transaction 交易信息

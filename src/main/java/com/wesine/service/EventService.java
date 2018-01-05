@@ -1,8 +1,10 @@
 package com.wesine.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -18,6 +20,25 @@ public class EventService {
 	private EventMapper eventMapper;
 
 	private Map<String, Object> conditionMap;
+	
+	//按天统计24小时的时间次数  区域经理
+	public int[][] getEvenPercentArr(String areaID) {
+		
+		List<Map<String,Object>> EvenPercentList=  eventMapper.selectEvenPercentList();
+		
+		int arrOutLength=eventMapper.countEvenPercent();//获取列表总数
+		
+		int [] [] temp;
+		temp=new int[arrOutLength][];
+		
+		for (int i = 0; i < temp.length; i++) {
+			temp[i]=new int[2];
+			temp[i][0]=(int)(EvenPercentList.get(i).get("allEventNum"));
+			temp[i][1]=(int)(EvenPercentList.get(i).get("incorrectPercent"));
+		}
+		return temp;
+	}
+	
 	
 	//按天统计24小时的时间次数  区域经理
 		public int[] getEvenArrThisMonth(String areaID) {

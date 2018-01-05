@@ -44,5 +44,15 @@ public class WesineMonitorApplicationTests {
 		}
 		
 	}
+	
+	@Test
+	public void testgetEvenArrPercent() {
+		
+		eventService.getEvenPercentArr("1");//传入一个areaid  获取EvenPercentlist
+		
+	}
 
+	
+	
+	
 }

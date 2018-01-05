@@ -569,7 +569,7 @@ var usrName=getQueryString("usrName");
 				var t;//一个bug暂时这么解决一下
 				t = setTimeout(function (){
 					_that.showRelatedCounters();
-				}, 100);
+				}, 400);
 				
 			},
 			closeCounterOpt:function(){
@@ -953,7 +953,7 @@ var usrName=getQueryString("usrName");
 				myTool1 : {
 					show : true,
 					title : '按月统计',
-					icon : 'image://http://localhost:8080/static/img/月.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/月.svg',
 					onclick : function() {
 						//							alert('myToolHandler1')
 					}
@@ -961,7 +961,7 @@ var usrName=getQueryString("usrName");
 				myTool2 : {
 					show : true,
 					title : '按周统计',
-					icon : 'image://http://localhost:8080/static/img/周.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/周.svg',
 					onclick : function() {
 						//							alert('myToolHandler2')
 						option.series[0].data=app.eventsForThisWeek;
@@ -971,7 +971,7 @@ var usrName=getQueryString("usrName");
 				myTool3 : {
 					show : true,
 					title : '按日统计',
-					icon : 'image://http://localhost:8080/static/img/日.svg',
+					icon : 'image://http://111.231.76.125:8080/static/img/日.svg',
 					onclick : function() {
 						//							alert('myToolHandler2')
 					}
