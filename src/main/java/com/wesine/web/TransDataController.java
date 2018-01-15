@@ -121,6 +121,7 @@ public class TransDataController {
 
 			if (!billList.get(i).get("Type").equals("Normal")) {// bills中type不正常的为事件
 																// event
+				
 				eventMap = new HashMap<String, Object>();
 				eventMap.put("id", UUID.randomUUID().toString());
 				eventMap.put("status", "未处理");
@@ -133,7 +134,15 @@ public class TransDataController {
 				// 时间戳 处理为date时间
 				
 				eventMap.put("date", TimeUtil.stampToDate(dataMap.get("TsStart")+""));
+				eventMap.put("startTime", dataMap.get("TsStart"));
+				eventMap.put("actionTime", 0);
+				eventMap.put("endTime", 0);
+				eventMap.put("shop_id", dataMap.get("ShopID"));
 				//System.out.println(TimeUtil.stampToDate(dataMap.get("TsStart")+""));
+				
+				//生成eventTAT数据
+				eventMapper.insertEventTAT(eventMap);
+				System.out.println("生成eventTAT数据！");
 
 				listMap.add(eventMap);
 			}

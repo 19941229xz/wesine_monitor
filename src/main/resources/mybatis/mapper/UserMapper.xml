@@ -3,8 +3,8 @@
 <mapper namespace="com.wesine.dao.UserMapper">
 
 	<insert id="insert" parameterType="java.util.Map">
-		insert into users (id,userName,password,phone,email,companyId,roleId)
-		values(#{usrID},#{usrName},#{password},#{phone},#{email},#{companyId},#{roleId})
+		insert into users (id,userName,companyId,roleId)
+		values(#{usrID},#{usrName},#{companyId},#{roleId})
 	</insert>
 
 

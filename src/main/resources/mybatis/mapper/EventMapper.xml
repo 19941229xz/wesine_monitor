@@ -204,6 +204,19 @@
 	
 	</update>
 	
+	<update id="updateEventTAT">
+	
+			UPDATE eventTAT
+				 <trim prefix="set" suffixOverrides=",">
+				  <if test="process_person_id !=null">process_person_id=#{process_person_id},</if>
+				  <if test="actionTime !=null">actionTime=#{actionTime},</if>
+				  <if test="endTime !=null">endTime=#{endTime},</if>
+				 </trim>
+		 WHERE event_id=#{event_id}
+	
+	
+	</update>
+	
 
 
 </mapper>

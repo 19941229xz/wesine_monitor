@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wesine.dao.EventMapper;
 import com.wesine.dao.UserMapper;
 import com.wesine.service.EventService;
+import com.wesine.util.TimeUtil;
 
 @Controller
 public class EventController {
@@ -138,6 +140,26 @@ public class EventController {
 		return resultMap;
 		
 		
+		
+	}
+	
+	
+	@RequestMapping(value="/createActionTime")
+	@ResponseBody
+	public Map<String,Object> createActionTime(@RequestParam Map<String,Object> params){
+		
+		
+		resultMap=new HashMap<String,Object>();
+		
+		long actionTime=System.currentTimeMillis();
+		
+		params.put("actionTime", actionTime);
+		
+		resultMap.put("actionTime", TimeUtil.stampToDateString(actionTime+""));
+		
+		resultMap.put("status",eventMapper.updateEventTAT(params)!=0?"0":"1");
+		
+		return resultMap;
 		
 	}
 	

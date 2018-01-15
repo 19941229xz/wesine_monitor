@@ -58,5 +58,12 @@ public interface EventMapper {
 	int countEvenPercent();
 	@Select("select allEventNum,incorrectPercent from eventAnalysi")
 	List<Map<String, Object>> selectEvenPercentList();
+	
+	
+	@Insert("insert into eventTAT (event_id,startTime,actionTime,endTime,shop_id)values(#{id},#{startTime},#{actionTime},#{endTime},#{shop_id})")
+	int insertEventTAT(Map<String,Object> map);
+	
+	
+	int updateEventTAT(Map<String,Object> map);
 
 }

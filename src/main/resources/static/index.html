@@ -380,12 +380,13 @@ var usrName=getQueryString("usrName");
 
                     		if (e.index == 1) {
                         	//去关联款台
-
-                        	
-                        	
+								_self.toEditCounter();
                     		} else {
                     		//不去关联款台
-                    		
+                    		var t;
+                    		t=setTimeout(function(){
+                    			_self.loadEventCount();
+                    		},5000)
                     		
 			                       	
 			                }
@@ -555,7 +556,7 @@ var usrName=getQueryString("usrName");
 				} 
 				
 			},
-			toEditCounter:function(){//跳转至 关联款台页面
+			toEditCounter : function(){//跳转至 关联款台页面
 				//关联的款台 check状态为checked
 				this.managerPage=false;
 				this.eventListPage=false;
@@ -690,6 +691,11 @@ var usrName=getQueryString("usrName");
 				}
 				//处理标题
 				this.title='14s';
+				
+				var t;
+				t=setTimeout(function(){
+					this.createActionTime();
+				},2000);
 				
 			},	
 			saveEditResult:function(event){
@@ -826,7 +832,35 @@ var usrName=getQueryString("usrName");
 				if(this.detailEvent.result.length!=0){
 					this.saveEditDisabled=true;
 				}
-			}
+			},
+			createActionTime : function(eventId){
+				
+				var _self=this;
+				
+				mui.ajax({
+					url:serverPath+"",
+					type:'get',
+					headers:{
+						'Content-Type':'application/x-www-form-urlencoded'
+					},
+					data:{
+						"event_id":eventId,
+						"process_person_id":_self.usrID
+					},
+					timeout:10000,
+					success:function(data){
+						if(data.status=='0'){
+							mui.toast("您于"+data.actionTime+"接管了该防损事件")
+						}else{
+							
+						}
+					},
+					error:function(xhr,type,errorThrown){
+						console.log(xhr+'\n'+type+'\n'+errorThrown)
+					}
+					
+				});
+			},
 			
 			
 			

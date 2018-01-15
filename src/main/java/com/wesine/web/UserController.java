@@ -1,6 +1,7 @@
 package com.wesine.web;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,10 +116,15 @@ public class UserController {
 			conditionMap.put("usrName", usrName);
 			conditionMap.put("companyId", "1");
 			conditionMap.put("shopId", shopID);
+			conditionMap.put("roleId", map.get("roleId"));//roleid  ==1   为防损员
+			
+			//users表中生成user数据  自动注册
+			userMapper.insert(conditionMap);
 			
 			if(judgeNum.equals("2")){//如果新注册角色微防损员  生成防损员基本信息  主键还是userid、
-				conditionMap.put("roleId", "1");//roleid  ==1   为防损员
 				fsyMapper.insertFsy(conditionMap);
+				System.out.println("新增加一防损员信息！");
+				
 			}
 		}
 		
@@ -135,12 +141,13 @@ public class UserController {
 		
 		String serverPath="http://"+request.getServerName()+":"+request.getServerPort();
 		
+		
 		if(map.get("roleId").equals(3)){//通过roleId判断角色  为3时为区域经理  跳转到index2
-			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index2.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index2.html?usrID="+map.get("usrID")+"&usrName="+URLEncoder.encode(map.get("usrName")+"", "utf-8")
 			+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
-			+"&serverPath="+serverPath);
+			+"&serverPath="+serverPath);//给usrName进行编码  中文乱码
 		}else{
-			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index.html?usrID="+map.get("usrID")+"&usrName="+map.get("usrName")
+			response.sendRedirect("http://"+request.getServerName()+":"+request.getServerPort()+"/static/index.html?usrID="+map.get("usrID")+"&usrName="+URLEncoder.encode(map.get("usrName")+"", "utf-8")
 			+"&roleId="+map.get("roleId")+"&areaID="+map.get("areaID")+"&shopID="+map.get("shopID")
 			+"&serverPath="+serverPath+"&status="+map.get("status"));
 		}

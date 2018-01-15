@@ -21,7 +21,6 @@ public interface UserMapper {
 	@Select("select * from users")
 	List<User> getAllUsers();
 
-	
 	int insert(Map<String, Object> conditionMap);
 
 	@Select("select count(id) from users where id=#{usrID}")
