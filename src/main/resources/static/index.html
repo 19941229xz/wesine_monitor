@@ -691,10 +691,10 @@ var usrName=getQueryString("usrName");
 				}
 				//处理标题
 				this.title='14s';
-				
+				var _self=this;
 				var t;
 				t=setTimeout(function(){
-					this.createActionTime();
+					_self.createActionTime(event.id);
 				},2000);
 				
 			},	
@@ -838,8 +838,8 @@ var usrName=getQueryString("usrName");
 				var _self=this;
 				
 				mui.ajax({
-					url:serverPath+"",
-					type:'get',
+					url:serverPath+"/createActionTime",
+					type:'post',
 					headers:{
 						'Content-Type':'application/x-www-form-urlencoded'
 					},

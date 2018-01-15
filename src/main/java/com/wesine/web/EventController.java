@@ -148,6 +148,7 @@ public class EventController {
 	@ResponseBody
 	public Map<String,Object> createActionTime(@RequestParam Map<String,Object> params){
 		
+		//判断该事件  是否有人处理  和是否存在eventTAT数据
 		
 		resultMap=new HashMap<String,Object>();
 		
