@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wesine.dao.BillMapper;
+import com.wesine.dao.CashierMapper;
 import com.wesine.dao.EventMapper;
+import com.wesine.dao.ShopMapper;
 import com.wesine.dao.TransactionMapper;
 import com.wesine.model.TransData;
 import com.wesine.service.RedisService;
@@ -34,6 +36,10 @@ public class TransDataController {
 	TransactionMapper transactionMapper;
 	@Autowired
 	EventMapper eventMapper;
+	@Autowired
+	CashierMapper cashierMapper;
+	@Autowired
+	ShopMapper shopMapper;
 
 	private Map<String, Object> resultMap;
 
@@ -61,6 +67,57 @@ public class TransDataController {
 
 		for (int i = 0; i < billList.size(); i++) {
 			billList.get(i).put("transId", uuid);
+			
+			
+			
+			//重新创建一个map村放条件
+			Map<String,Object> cashierMap=new HashMap<String,Object>();
+			cashierMap.put("c_id", dataMap.get("CashierID"));
+			
+			if(cashierMapper.countCashierID((String)dataMap.get("CashierID"))!=0&&billList.get(i).get("Type").equals("Normal")){//判断该cashierID是否存在  且为正常事件
+				//存在的情况  且为正常事件
+				int s_num=cashierMapper.getSnumByCashierID((String)dataMap.get("CashierID"));
+				int e_num=cashierMapper.getEnumByCashierID((String)dataMap.get("CashierID"));
+				
+				
+				cashierMap.put("s_num", (++s_num));//收银次数加1
+				cashierMap.put("e_num", e_num);
+				
+				System.out.println(cashierMapper.updateByCashierID(cashierMap)==1?"收银员id:"+dataMap.get("CashierID")+"收银次数加1":"error");
+				
+				
+			}else if(cashierMapper.countCashierID((String)dataMap.get("CashierID"))!=0&&!billList.get(i).get("Type").equals("Normal")){
+				//存在的情况  且为正常事件
+				int s_num=cashierMapper.getSnumByCashierID((String)dataMap.get("CashierID"));
+				int e_num=cashierMapper.getEnumByCashierID((String)dataMap.get("CashierID"));
+				
+				//存在的情况  且为防损事件
+				cashierMap.put("s_num", (++s_num));//收银次数加1
+				cashierMap.put("e_num", (++e_num));//事件次数也加1
+				
+				System.out.println(cashierMapper.updateByCashierID(cashierMap)==1?"收银员id:"+dataMap.get("CashierID")+"\n收银次数加1\n"+"事件次数加1":"error");
+				
+			}else{
+				//没有该收银员数据  需重新生成
+				cashierMap.put("id", UUID.randomUUID()+"");//uuid  要转成string
+				cashierMap.put("shop_id", dataMap.get("ShopID"));
+				//根据shopid查询shopname
+				String shopName=shopMapper.getShopNameByID((String)dataMap.get("ShopID"));
+				if(shopName==null||shopName.equals("")){
+					//如果查询不到该店面  就需要在数据库中重新生成
+					cashierMap.put("shop_name", dataMap.get("ShopID")+"号店");
+					cashierMap.put("areaId", "");
+					shopMapper.insertShop(cashierMap);
+					
+					cashierMapper.insertCashier(cashierMap);
+				}else{//查询到了  就直接添加
+					cashierMap.put("shop_name", shopName);
+					
+					cashierMapper.insertCashier(cashierMap);
+				}
+				
+				
+			}
 
 			if (!billList.get(i).get("Type").equals("Normal")) {// bills中type不正常的为事件
 																// event

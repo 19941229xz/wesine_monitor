@@ -40,7 +40,7 @@ public class EventService {
 	}
 	
 	
-	//按天统计24小时的时间次数  区域经理
+	//按月统计24小时的时间次数  区域经理
 		public int[] getEvenArrThisMonth(String areaID) {
 			//创建一个map村放查询所需条件
 			conditionMap = new HashMap<String, Object>();

@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.wesine.dao.CounterMapper;
+import com.wesine.dao.FsyMapper;
 import com.wesine.dao.UserMapper;
 import com.wesine.model.User;
 
@@ -35,6 +36,8 @@ public class UserController {
 	
 	@Autowired
 	CounterMapper counterMapper;
+	@Autowired
+	FsyMapper fsyMapper;
 
 	@RequestMapping(value = "/users")
 	@ResponseBody
@@ -111,11 +114,12 @@ public class UserController {
 			conditionMap.put("usrID", usrID);
 			conditionMap.put("usrName", usrName);
 			conditionMap.put("companyId", "1");
-			//将获取到的user信息注册到users数据表中
-			userMapper.insert(conditionMap);
-			System.out.println("------新注册一名防损人员：usrID:"+usrID+"\tusrName:"
-			+usrName+"\tcompanyId:"+conditionMap.get("companyId")+"-----");
+			conditionMap.put("shopId", shopID);
 			
+			if(judgeNum.equals("2")){//如果新注册角色微防损员  生成防损员基本信息  主键还是userid、
+				conditionMap.put("roleId", "1");//roleid  ==1   为防损员
+				fsyMapper.insertFsy(conditionMap);
+			}
 		}
 		
 		if(roleId.equals("1")&&counterMapper.countUserCounter(usrID)==0){//if roleId =0 is 防损员  查询是否关联款台

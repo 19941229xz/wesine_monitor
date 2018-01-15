@@ -6,7 +6,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport"
 	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Insert title here</title>
+<title>银线防损</title>
 <script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
 <link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css"
 	rel="stylesheet"></link>
@@ -68,72 +68,66 @@ border-color: #5D9CEC;
 <body>
 	<div id="app">
 	
-	<div v-show="loadingPage" style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
+	<!-- <div style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
 		<img  style="margin-top: 230px;"  alt="" src="http://localhost:8080/static/img/loading.gif">
-	</div>
+	</div> -->
 	
-		<header class="mui-bar mui-bar-nav">
-			<a v-show="back_button" v-on:tap="back" style="color:black;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<a id="" v-on:tap="showCounterOpt" v-if="!back_button" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right"></a>
+	
+	<header class="mui-bar mui-bar-nav">
+			<a v-on:tap="toMain" v-show="backBtn" style="color:black;" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a v-on:tap="{{opt=!opt}}" v-show="optBtn" style="color:black;" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right"></a>
 			<!--右上角弹出菜单-->
 		
-					<ul id="topMenu" class="mui-table-view" style="width:30%;position: fixed;top: 45px;z-index:999;right: 0" v-show="counterOption" >
-						<li v-show="option_glkt" class="mui-table-view-cell">
-							<a v-on:tap="toEditCounter" href="#">关联门店</a>
+					<ul v-show="opt" id="topMenu" class="mui-table-view" style="width:30%;position: fixed;top: 45px;z-index:999;right: 0"  >
+						<li class="mui-table-view-cell">
+							<a v-on:tap="toShopPage($event)"   href="#">关联门店</a>
 						</li>
 						<!-- <li class="mui-table-view-cell"><a href="#">绑定所有</a>
 						</li>
 						<li class="mui-table-view-cell"><a href="#">解绑所有</a>
 						</li> -->
 					</ul> 
-			<h1 class="mui-title" style="font-size:20px;font-weight: bold;">{{title | changeTitle}}</h1>
+			<h1 class="mui-title" style="font-size:20px;font-weight: bold;">防损系统管理</h1>
 		</header>
 		
-		
-				
-
-
-<!-- 防损管理首页 -->
-		<div v-show="managerPage" class="mui-content" v-on:tap="closeCounterOpt" style="background-color: #F8F8F8;">
+		<div v-show="mainPage" class="mui-content" style="background-color: #F8F8F8;">
 		<center><h4>本日状况</h4></center>
 		
 			<ul class="mui-table-view mui-grid-view mui-grid-9 eventNum"
 				style="background-color: #F8F8F8;">
-				<li v-on:tap="wclDivClick" v-bind:style="wcllstyleObj"  
-					class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-3">
-					<a href="#"> <span class="mui-icon" >{{eventClzNum}}</span>
-						<p v-bind:style="wclpObj">处理中</p>
+				<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon" >{{clzNum}}</span>
+						<p>处理中</p>
 				</a>
 				</li>
-				<li v-on:tap="wcDivClick" v-bind:style="wclstyleObj"
-					class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-3">
-					<a href="#"> <span class="mui-icon">{{eventsStatus2 | getLength}}</span>
-						<p v-bind:style="wcpObj">已完成</p>
+				<li class="mui-table-view-cell mui-media mui-col-xs-6 mui-col-sm-3">
+					<a href="#"> <span class="mui-icon">{{ywcNum}}</span>
+						<p>已完成</p>
 				</a>
 				</li>
 			</ul>
-
-			<div id="eventChart" style="height: 250px;width:100%"></div>
 			
+			<!-- 防损事件图 -->
+			<div id="eventChart" style="height: 250px;width:100%"></div>
+			<!-- 事件差错图 -->
 			<div id="echarts-scatter-chart" style="height: 250px;width:100%"></div>
 			
 			
-			<!-- 收银员  防损员  情况  start -->
-			
 			<div style="padding: 10px 10px;">
 				<div id="segmentedControl" class="mui-segmented-control">
-					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >收银员</a>
-					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">防损员</a>
+					<a class="mui-control-item" >收银员</a>
+					<a class="mui-control-item" >防损员</a>
 				</div>
 				<div id="segmentedControl" class="mui-segmented-control" style="margin-top: 10px;">
-					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >本周</a>
-					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">本月</a>
-					<a class="mui-control-item" v-bind:style="syyObj" v-on:tap="toSyyCard" >近三个月</a>
-					<a class="mui-control-item" v-bind:style="fsyObj" v-on:tap="toFsyCard">近半年</a>
+					<a class="mui-control-item" >本周</a>
+					<a class="mui-control-item" >本月</a>
+					<a class="mui-control-item" >近三个月</a>
+					<a class="mui-control-item" >近半年</a>
 				</div>
 			</div>
+			
 			<div>
-				<div id="" :class="{'mui-active': isSyyCard}" class="mui-control-content">
+				<div class="mui-control-content mui-active">
 					<div id="scroll" class="mui-scroll-wrapper">
 						<div class="mui-scroll">
 							<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
@@ -172,7 +166,7 @@ border-color: #5D9CEC;
 						</div>
 					</div>
 				</div>
-				<div id="" :class="{'mui-active': isFsyCard}" class="mui-control-content">
+				<div class="mui-control-content">
 					<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
 								<tr>
 									<th width=20%>防损员</th>
@@ -228,25 +222,22 @@ border-color: #5D9CEC;
 				
 			</div>
 			
-			<!-- end -->
-						<!-- 收银员饼状图 -->
-							<div id="echarts-pie-chart-syy" v-show="pieSyy" style="height: 250px;width:100%;margin-top: 10px;"></div>
-							<!-- 防损员饼状图 -->
-							<div id="echarts-pie-chart-fsy" v-show="pieFsy" style="height: 250px;width:100%;margin-top: 10px;"></div>
-
+			
 		</div>
-		
-		
-		
-		<!-- !(managerPage||eventListPage) -->
-<div v-show="!(managerPage||eventListPage||detailPage)" class="mui-content" style="background-color: #F8F8F8;">
-<!-- 款台绑定页 -->
+	
+	
+	<div v-show="shopPage" class="mui-content" style="background-color: #F8F8F8;">
+<!-- 门店关联页 -->
 <div style="" class="mui-card">
 				<form class="mui-input-group">
-					<div v-for="counter in counterList" class="mui-input-row mui-checkbox" style="height: 50px;">
-						<label :for="counter.id" style="line-height: 2.0;text-align: justify;">ID:{{counter.id}}名称:{{counter.name}}类型:{{counter.typeId | changeTitle}} </label>
-						<input :id="counter.id" style="font-size: 40px;line-height:0.8 ;"  :value="counter.id" type="checkbox" v-model="counterPicked"  ></input>
+					<div v-for="shop in shopList" class="mui-input-row mui-checkbox" style="height: 50px;">
+						<!-- <label :for="shop.id" style="line-height: 2.0;text-align: justify;">ID:{{shop.id}}名称:{{shop.name}}</label>
+						<input :id="shop.id" style="font-size: 40px;line-height:0.8 ;"  :value="shop.id" type="checkbox" v-model=""  ></input> -->
+					<label :for="shop.id" style="line-height: 2.0;text-align: justify;">ID:{{shop.id}}名称:{{shop.name}}</label>
+					<input :id="shop.id" style="font-size: 40px;line-height:0.8 ;"  :value="shop.id" type="checkbox" v-model="chooseShop"></input>
 					</div>
+					
+					<!-- <div>{{chooseShop}}</div> -->
 					<!--  <div class="mui-input-row mui-checkbox">
 						{{counterPicked}}
 					</div> -->
@@ -256,14 +247,12 @@ border-color: #5D9CEC;
 					</div> -->
 				</form>
 			</div>
-			<button v-on:tap="saveUserCounter" type="button" class="mui-btn mui-btn-primary mui-btn-block " style="position: fixed;bottom:0px;margin-bottom: 0px;">保存</button>
+			<button v-on:tap="saveShop"  type="button" class="mui-btn mui-btn-primary mui-btn-block " style="position: fixed;bottom:0px;margin-bottom: 0px;">保存</button>
 </div>
+	
 
-	</div>
-<!-- vue框架 -->
+	</div><!-- end  div -->
 <script type="text/javascript" charset="utf-8">
-//alert(usrID)
-//const serverPath="http://localhost:8080";
 
 function getQueryString(name) { 
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
@@ -279,117 +268,58 @@ var shopID=getQueryString("shopID");
 var areaID=getQueryString("areaID");
 var usrName=getQueryString("usrName");
 
-
-
-//alert(location.hostname)
-/* document.onclick=function(){
-	mui("#topMenu").style.display='none';
-} */
-
-	var app = new Vue({
-		el : '#app',
-		data : {
-			roleId : '',
-			shopID : '',
-			areaID : '',
-			usrName : '',
-			usrID:'',
-			
-			title:'10',
-			
-			eventsStatus0:[],//未处理事件
-			eventsStatus1:[],//暂存事件
-			eventsStatus2:[],//完成事件
-			eventsForThisWeek:[],//按周统计
-			eventsForThisDay:[],//按日统计
-			eventsForThisMonth:[],//按月统计
-			eventClzNum:0,//处理中事件件数
-			
-			eventPercentGraphData:[],//差错图数据
-			
-			
-			
-			selectedEvents:[],//当前要显示的事件
-			
-			wcllstyleObj:{//未处理li style
-				color: 'white',
-			    background:'#5D9CEC'
-			},
-			wclpObj:{
-				color: 'white',
-			},
-			zclstyleObj:{//暂存li style
-				color: '',
-			    background:'#F1F1F1'
-			},
-			zcpObj:{
-				color: '',
-			},
-			wclstyleObj:{//完成li style
-				color: '',
-			    background:'#F1F1F1'
-			},
-			wcpObj:{
-				color: '',
-			},
-			
-			
-			
-			syyObj:{//收银员 选项卡样式
-				color: 'white',
-			    background:'#5D9CEC'
-			},
-			fsyObj:{//防损员 选项卡样式
-				color: '',
-			    background:'#F1F1F1'
-			},
-			isFsyCard:false,//是否显示防损员表格
-			isSyyCard:true,//是否显示收银员表格
-			pieSyy:true,//是否显示收银员饼图
-			pieFsy:false,//是否显示防损员饼图
-			
-			
-			
-			
-			isEventListShow:true,
-			isNoEventShow:false,
-			noEventTip:'没有未处置事件',
-			
-			managerPage:true,
-			eventListPage:false,
-			counterEditPage:false,
-			detailPage:false,
-			
-			back_button:false,//左上角返回按钮是否可见
-			counterOption:false,
-			option_glkt:true,
-			
-			counterList:[],
-			userCounter:[],
-			
-			counterPicked:[],
-			
-			detailEvent:{//被点击查看详情的事件
-				
-			},
-			saveEditDisabled:true,
-			detailBtn:'保存',//详情页  按钮文字
-			detailBtnShow:true,//详情页  按钮是否显示
-			
-			disabled: false,//详情页表单是否可点击
-			
-			loadingPage:true,//页面载入动画
-			
-			
-			
+//单页面vue实例
+var app = new Vue({
+	el : '#app',
+	data : {
+		roleId : '',
+		shopID : '',
+		areaID : '',
+		usrName : '',
+		usrID:'',
+		
+		
+		eventsStatus0:[],//未处理事件
+		eventsStatus1:[],//暂存事件
+		eventsStatus2:[],//完成事件
+		eventsForThisWeek:[],//按周统计
+		eventsForThisDay:[],//按日统计
+		eventsForThisMonth:[],//按月统计
+		eventPercentGraphData:[],//差错图数据
+		
+		clzNum:0,
+		ywcNum:0,
+		
+		shopList:[],//区域关联门店列表
+		
+		shopPage : false,//门店列表页面
+		mainPage : true,//单页面应用主页
+		
+		opt : false,//右上角菜单列表
+		backBtn : false,//返回按钮
+		optBtn : true,//右上角菜单按钮
+		
+		chooseShop:[],//被选中的商店
+		
+		
+		
 		},
-		// 在 `methods` 对象中定义方法
-		methods : {
+		methods:{
+			loadUserInfo : function(){//将区域经理信息通过ajax加载到页面中来
+				this.roleId=roleId;
+				this.shopID=shopID; 
+				this.areaID=areaID;
+				this.usrName=usrName;
+				this.usrID=usrID;
+				
+				console.log("---login action---\nusrID:"+this.usrID+"\nareaID:"+this.areaID+"\nusrName:"+
+						this.usrName+"\nshopID:"+this.shopID+"\nroleId:"+this.roleId+"\n---end---")
+			},
 			loadEventCount : function() {
-				
 				var _self=this;
-				
 				//alert('test')
+				var startTime=new Date().getTime();
+				var endTime;
 				mui.ajax({
                     url : serverPath+"/getEventData",
                     type : 'get',
@@ -406,7 +336,8 @@ var usrName=getQueryString("usrName");
                     }, 
                     timeout : 10000,
                     success : function(data){ 
-
+                    	endTime=new Date().getTime();
+                    	mui.toast('延迟:'+(parseInt(endTime)-parseInt(startTime))+'ms');
                         //var result = eval('('+ data +')');    //js原生方法解析json字符串为json对象
                     	//vue.data  load  data
                         _self.eventsStatus0=data.eventsStatus0;
@@ -419,10 +350,9 @@ var usrName=getQueryString("usrName");
                     	//差错图数据
                     	_self.eventPercentGraphData=data.eventPercentGraphData;
                     	
-                    	//计算处理中事件件数
-                    	_self.eventClzNum=data.eventsStatus0.length+data.eventsStatus1.length;
-                    	//登陆页面后 默认先加载未处理事件
-                    	_self.selectedEvents=data.eventsStatus0;
+                    	//计算处理中和已完成事件件数
+                    	_self.clzNum=_self.eventsStatus0.length+_self.eventsStatus1.length;
+                    	_self.ywcNum=_self.eventsStatus2.length;
                     	
                     	
                     	//如果是防损员及 roleId=1 时  判断是否关联款台（本月）
@@ -455,6 +385,8 @@ var usrName=getQueryString("usrName");
                     	
                     },
                     error : function(xhr,type,errorThrown){
+                    	endTime=new Date().getTime();
+                    	mui.toast('延迟:'+(parseInt(endTime)-parseInt(startTime))+'ms');
                         console.log(xhr);
                         console.log(type);
                         console.log(errorThrown);
@@ -462,535 +394,83 @@ var usrName=getQueryString("usrName");
       		});
 
 		},
+		loadShopList : function(){//根据区域id加载关联门店id
 			
-			wclDivClick:function(){//未处理计数div被点击事件
-				//js处理li被点击后的样式
-				this.wcllstyleObj.background='#5D9CEC'
-				this.wcllstyleObj.color='white'
-				this.wclpObj.color='white'
-				
-				this.zclstyleObj.background='#F1F1F1'
-				this.zclstyleObj.color=''
-				this.zcpObj.color=''
-				
-				this.wclstyleObj.background='#F1F1F1'
-				this.wclstyleObj.color=''
-				this.wcpObj.color=''
-				//切换显示的event数据源
-				this.selectedEvents=this.eventsStatus0
-				this.title='10';
-				//控制详情页按钮
-				this.detailBtnShow=true;
-				this.detailBtn='保存';
-				
-				console.log(this.selectedEvents.length)
-				if(this.selectedEvents.length==0){
-					this.noEventTip='没有未处置事件';
-					this.isEventListShow=false;
-					this.isNoEventShow=true;
-				}else{
-					this.isEventListShow=true;
-					this.isNoEventShow=false;
-				}
-				
-				
-			},
-			zcDivClick:function(){//暂存计数div被点击事件
-				//js处理li被点击后的样式
-				this.wcllstyleObj.background='#F1F1F1'
-				this.wcllstyleObj.color=''
-				this.wclpObj.color=''
-				
-				this.zclstyleObj.background='#5D9CEC'
-				this.zclstyleObj.color='white'
-				this.zcpObj.color='white'
-				
-				this.wclstyleObj.background='#F1F1F1'
-				this.wclstyleObj.color=''
-				this.wcpObj.color='' 
-				//切换显示的event数据源
-				this.selectedEvents=this.eventsStatus1
-				this.title='11';
-				//控制详情页按钮
-				this.detailBtnShow=true;
-				this.detailBtn='提交';
+			var _self=this;
 			
+			mui.ajax({
+				url : serverPath+"/getShopListByAreaId/"+this.areaID+"/"+this.usrID,
+                type : 'get',
+                headers: {
+                   'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              timeout : 10000,
+              success : function(data){
+              	if(data.status==0){
+              		_self.shopList=data.shopList;
+              		console.log('关联门店数量：'+_self.shopList.length);
+              		//渲染到html中
+              		
+              	}else{
+              		mui.toast('门店数据请求失败！');
+              	}
+              	
+              },
+              error : function(xhr,type,errorThrown){
+                  console.log(xhr);
+                  console.log(type);
+                  console.log(errorThrown);
+              }
+			});
 			
-				console.log(this.selectedEvents.length)
-				if(this.selectedEvents.length==0){
-					this.noEventTip='没有待提交事件'
-					this.isEventListShow=false
-					this.isNoEventShow=true
-				}else{
-					this.isEventListShow=true;
-					this.isNoEventShow=false;
-				}
-			},
-			wcDivClick:function(){//完成计数div被点击事件
-				//js处理li被点击后的样式
-				this.wcllstyleObj.background='#F1F1F1'
-				this.wcllstyleObj.color=''
-				this.wclpObj.color=''
-				
-				this.zclstyleObj.background='#F1F1F1'
-				this.zclstyleObj.color=''
-				this.zcpObj.color=''
-				
-				this.wclstyleObj.background='#5D9CEC'
-				this.wclstyleObj.color='white'
-				this.wcpObj.color='white' 
-				//切换显示的event数据源
-				this.selectedEvents=this.eventsStatus2
-				this.title='12';
-				//控制详情页按钮
-				this.detailBtnShow=false;
-				this.detailBtn='';
-			
-			
-				console.log(this.selectedEvents.length)
-				if(this.selectedEvents.length==0){
-					this.noEventTip='没有已完成事件'
-					this.isEventListShow=false
-					this.isNoEventShow=true
-				}else{
-					this.isEventListShow=true;
-					this.isNoEventShow=false;
-				}
-			},
-			toFsyCard:function(){//切换到防损员选项卡
-				
-				this.syyObj.color='';
-				this.syyObj.background='#F1F1F1';
-				
-				this.fsyObj.color='white';
-				this.fsyObj.background='#5D9CEC';
-				
-				this.isFsyCard=true;
-				this.isSyyCard=false;
-				
-				this.pieSyy=false;
-				this.pieFsy=true;
-				
-				
-			},
-			toSyyCard:function(){//切换到收银员选项卡
-				this.fsyObj.color='';
-				this.fsyObj.background='#F1F1F1';
-				
-				this.syyObj.color='white';
-				this.syyObj.background='#5D9CEC';
-				
-				this.isFsyCard=false;
-				this.isSyyCard=true;
-				
-				this.pieSyy=true;
-				this.pieFsy=false;
-			},
-			getMoreEvent:function(){
-				console.log("selectedEvent:"+this.selectedEvents.length)
-				 this.managerPage=false;
-				this.eventListPage=true;
-				this.back_button=true;
-				this.title+='s';
-			},
-			back:function(){
-				this.managerPage=true;
-				this.eventListPage=false;
-				this.back_button=false;
-				this.detailPage=false;
-				//this.detailBtnShow=true;
-				//去点最后一个字符  s
-				var basic=this.title;
-				basic = basic.substr(0, basic.length - 1); 
-				if(basic=='13'){//刚刚从款台页面跳回的
-					//重新从后台获取event数据
-
-					//默认重新加载未处理事件
-					basic='10';
-					//切换显示的event数据源  到未处理事件
-					this.selectedEvents=this.eventsStatus0
-				}
-				this.title=basic;
-				console.log("title:"+this.title)
-			},
-			showCounterOpt:function(){
-				this.counterOption=!this.counterOption;
-				
-				if(this.roleId==='2'){//这是防损经理  默认关联所有款台
-					this.option_glkt=false;
-				} 
-				
-			},
-			toEditCounter:function(){//跳转至 关联款台页面
-				//关联的款台 check状态为checked
-				this.managerPage=false;
-				this.eventListPage=false;
-				this.counterOption=false;
-				this.back_button=true;
-				mui.toast('点击保存绑定才会生效喔')
-				this.title='13s';
-				
-				var _that=this;
-				
-				var t;//一个bug暂时这么解决一下
-				t = setTimeout(function (){
-					_that.showRelatedCounters();
-				}, 100);
-				
-			},
-			closeCounterOpt:function(){
-				this.counterOption=false;
-			},
-			loadCounterListData:function(){
-				
-				var _self=this;
-				
-				mui.ajax({//向服务器获取款台数据
-					url : serverPath+"/getCounterListByShopId/"+this.shopID+'/'+this.usrID,
-                    type : 'get',
-                    headers: {
-                       'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                    data : { 
-                    	
-                    }, 
-                    timeout : 10000,
-                    success : function(data){
-                    	_self.counterList=data.counterList;
-                    	_self.userCounter=data.userCounter; 
-                    	console.log('绑定款台数量：'+_self.userCounter.length);
-                    	
-                    },
-                    error : function(xhr,type,errorThrown){
-                        console.log(xhr);
-                        console.log(type);
-                        console.log(errorThrown);
-                    }
-				});
-			},
-			showRelatedCounters:function(){
-				//先清空  在push
-				var _self=this;
-				this.counterPicked=[];
-				
-				
-				for(var i=0;i<this.userCounter.length;i++){
-					_self.counterPicked.push((this.userCounter)[i].counterId);
-            	} 
-				
-				
-            	console.log("push："+this.counterPicked.length)
-            	/* var str='';
-            	for(var i=0;i<this.counterPicked.length;i++){
-            		str+=','+this.counterPicked[i];
-            	} */
-			},
-			test:function(i){
-				this.counterPicked.push((this.userCounter)[i].counterId);
-			},
-			saveUserCounter:function(){
-				
-				var _self=this;
-				
-				var counterId='';
-				
-				for(var i=0;i<this.counterPicked.length;i++){
-					if(i==0){
-						counterId+=this.counterPicked[i];
-					}else{
-					counterId+=','+this.counterPicked[i];
-					}
-				}
-				
-				mui.ajax({
-					url : serverPath+"/saveUserCounter/"+this.usrID,
-                    type : 'get',
-                    headers: {
-                       'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                  data : { 
-                  	"counterId":counterId
-                  }, 
-                  timeout : 10000,
-                  success : function(data){
-                  	if(data.status==0){
-                  		mui.toast('绑定成功');
-                  		//跳转到manager页面  重载event数据  和 counter数据
-                  		_self.loadEventCount();
-	                    _self.loadCounterListData();
-                  		_self.back();
-                  		
-                  	}
-                  	
-                  },
-                  error : function(xhr,type,errorThrown){
-                      console.log(xhr);
-                      console.log(type);
-                      console.log(errorThrown);
-                  }
-				});
-				
-			},
-			toDetailPage:function(event){
-				this.detailEvent=event;
-				mui("video")[0].src = event.VideoUrl+'?'+Math.random();
-				//alert('result:'+event.comment)
-				//alert('result:'+event.id)
-				//alert("eventID："+this.detailEvent.VideoUrl)
-				console.log("titleNum:"+this.title)
-				
-				this.managerPage=false;
-				this.eventListPage=false;
-				this.detailPage=true;
-				this.back_button=true;//显示返回按钮
-				
-				//控制表单是否可编辑
-				this.disabled=!this.detailBtnShow;
-				
-				if(event.result==''){
-					mui.toast('请选择审核结论');
-				}else if(event.comment==''||event.productName==''){
-					mui.toast('请补全事件详细信息');
-				}else{
-					
-				}
-				//处理标题
-				this.title='14s';
-				
-			},	
-			saveEditResult:function(event){
-				var _self=this;
-				//前台数据校验
-				switch(this.detailBtn){
-				
-				case "保存":
-					
-					event.status='暂存';
-					if(event.result.length!=0){
-						//前台打印修改的结果
-						console.log("---保存编辑结果---"+"/n id:"+event.id+"/n comment:"+event.comment+"/n productName:"+event.productName+"/n money:"+event.money
-								+"/n result:"+event.result+"/n status:"+event.status)
-						
-						
-						
-						mui.ajax({//向服务器获取款台数据
-							url : serverPath+"/saveEditResult",
-		                    type : 'post',
-		                    headers: {
-		                       'Content-Type': 'application/x-www-form-urlencoded'
-		                  },
-		                    data : { 
-		                    	id:event.id,
-		                    	comment:event.comment,
-		                    	productName:event.productName,
-		                    	money:event.money,
-		                    	result:event.result,
-		                    	status:event.status,
-		                    }, 
-		                    timeout : 10000,
-		                    success : function(data){
-		                    	if(data.status==0){
-		                      		mui.toast('保存成功');
-		                      		//跳转到manager页面  重载event数据  和 counter数据
-		                      		_self.loadEventCount();
-		                      		_self.loadCounterListData();
-		                      		_self.back();
-		                      		
-		                      	}
-		                    },
-		                    error : function(xhr,type,errorThrown){
-		                        console.log(xhr);
-		                        console.log(type);
-		                        console.log(errorThrown);
-		                    }
-						});
-
-					}else{
-						mui.toast('审核结论不能为空');
-					}
-					
-					break;
-					
-				case "提交":
-					/* console.log("empty:"+event.comment.replace(/(^s*)|(s*$)/g, "").length)
-					
-					event.comment=event.comment.replace(/(^\s*)/g, "");
-					event.productName=event.comment.replace(/(^\s*)/g, "");
-					
-					console.log("empty later:"+event.comment.replace(/(^s*)|(s*$)/g, "").length) */
-					
-					event.status='完成';
-					//alert(event.comment);
-					//event.comment='testetst';
-					
-					//alert(mui("#save_commet")[0].value());
-					
-					//return;
-					
-					//alert(event.comment+"+"+event.productName)
-					if(event.comment.length!=0&&event.productName.length!=0){
-						//前台打印修改的结果
-						console.log("---保存编辑结果---"+"/n id:"+event.id+"/n comment:"+event.comment+"/n productName:"+event.productName+"/n money:"+event.money
-								+"/n result:"+event.result+"/n status:"+event.status)
-						
-						
-						
-						mui.ajax({//向服务器获取款台数据
-							url : serverPath+"/saveEditResult",
-		                    type : 'post',
-		                    headers: {
-		                       'Content-Type': 'application/x-www-form-urlencoded'
-		                  },
-		                    data : { 
-		                    	id:event.id,
-		                    	comment:event.comment,
-		                    	productName:event.productName,
-		                    	money:event.money,
-		                    	result:event.result,
-		                    	status:event.status,
-		                    }, 
-		                    timeout : 10000,
-		                    success : function(data){
-		                    	if(data.status==0){
-		                      		mui.toast('提交成功');
-		                      		//跳转到manager页面  重载event数据  和 counter数据
-		                      		_self.loadEventCount();
-		                      		_self.loadCounterListData();
-		                      		_self.back();
-		                      		
-		                      	}
-		                    },
-		                    error : function(xhr,type,errorThrown){
-		                        console.log(xhr);
-		                        console.log(type);
-		                        console.log(errorThrown);
-		                    }
-						});
-
-					}else{
-						mui.toast('补全所有信息才能提交喔');
-					}
-					
-					
-					break;
-					
-				default:
-					
-					break;
-				
-				
-				}
-				
-					
-					
-				
-				
-				
-								
-			},
-			watchEditChange:function(){
-				if(this.detailEvent.result.length!=0){
-					this.saveEditDisabled=true;
-				}
-			}
-			
-			
-			
-
 		},
-		mounted : function() {
-			//alert("vue load ")
-			//加载隐藏域中的变量
-			this.roleId=roleId;
-			this.shopID=shopID; 
-			this.areaID=areaID;
-			this.usrName=usrName;
-			this.usrID=usrID;
+		toShopPage :function(event){
+			//event.cancelBubble = true;
+			var _self=this;
+			mui.toast('保存后才会生效哦！')
+			var t;
+			t = setTimeout(function (){
+				
+				_self.mainPage=false;
+				_self.shopPage=true;
+				_self.opt=false;
+				_self.backBtn=true;
+				_self.optBtn=false;
+				console.log(_self.chooseShop);
+				_self.chooseShop=[];
+				
+				
+			}, 100); 
 			
-			console.log("---login action---\nusrID:"+this.usrID+"\nareaID:"+this.areaID+"\nusrName:"+
-					this.usrName+"\nshopID:"+this.shopID+"\nroleId:"+this.roleId+"\n---end---")
+			//mui.toast(this.chooseShop)
+		},
+		toMain : function(){
+			this.mainPage=true;
+			this.shopPage=false;
+			this.backBtn=false;
+			this.optBtn=true;
+		},
+		saveShop:function(){
+			this.toMain();
+			var t;
+			t=setTimeout(function(){
+				mui.toast('保存成功！')
+			},500)
 			
+		},
+			
+		},//method   end>>>>>>>>
+		mounted:function(){
+			this.loadUserInfo();
 			this.loadEventCount();
-			this.loadCounterListData();
-			this.wclDivClick();
-			
-			this.loadingPage=false;//关闭载入页
-			
-			
-			//alert('load success'+this.usrID)
+			this.loadShopList();
 		},
-		beforeCreate: function () {
-            console.group('beforeCreate 创建前状态===============》');
-           //alert("页面正在载入中....") ;
-    	},
-		filters: {//过滤器
-			  getLength: function (value) {
-			    return value.length
-			  },
-			  changeTitle:function(value){//字符串 过滤处理器 根据需要配置
-				  
-					  if(value==='1'||value==='10'||value==='11'||value==='12'||value==='14'){
-						  this.detailBtnShow=true;
-						  return '防损系统管理';
-					  }
-				  
-					  if(value==='10s'){
-						  //console.log(back_button)
-						  this.detailBtnShow=true;
-						  this.detailBtn="保存";
-						  return '未处理事件列表';
-					  }
-					  if(value==='11s'){
-						  this.detailBtnShow=true;
-						  this.detailBtn="提交";
-						  return '暂存事件列表';
-					  }
-					  if(value==='12s'){
-						  this.detailBtnShow=false;
-						  return '完成事件列表';
-					  }
-					  if(value==='13s'){
-						  this.detailBtnShow=true;
-						  return '门店列表';
-					  }
-					  if(value==='14s'){
-						  this.detailBtnShow=true;
-						  return '事件详情';
-					  }
-					  if(value==0){
-						  return '传统银台';
-					  }
-					  if(value==1){
-						  return '自助银台';
-					  }
-					  
-					  console.log('当前用户roleId:'+this.roleId);
-			  },
-			  watchNumChange:function(value){
-				  
-			  },
-			}//过滤器 end
-	}) 
-</script>
-
-</body>
-
-
-
-
-
-
-
-
-
-
-
-
-<script type="text/javascript" charset="utf-8">
-//alert(usrID)
-	var eventChart = echarts.init(document.getElementById('eventChart'));
+	});
 	
 	
+//防损事件echarts
+function eventEcharts(){
+var eventChart = echarts.init(document.getElementById('eventChart'));
 
 	var option = {
 		title : {
@@ -1092,17 +572,12 @@ var usrName=getQueryString("usrName");
 			data : [ 0, 0, 0, 0, 0, 0, 0 ]
 		} ]
 	};
-
-	//alert(option.toolbox.feature.myTool1.icon)
-
-	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/月.svg';
-	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/周.svg';
-	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/日.svg';
-	//alert(option.toolbox.feature.myTool1.icon)
-//option.series.data=[1,2,3,4,5,6,7];
 	
-	function loadMonthData(){
-		option.series[0].data=app.eventsForThisMonth;
+	
+	
+	var t;//一个bug暂时这么解决一下
+	t = setTimeout(function (){
+option.series[0].data=app.eventsForThisMonth;
 		
 		var date = new Date();
 	     var year = date.getFullYear();
@@ -1119,211 +594,132 @@ var usrName=getQueryString("usrName");
 		
 		
 		eventChart.setOption(option);
-	}
+	}, 1000);
 	
-	if(app.eventsForThisMonth.length==0){
+	
+}
+
+//事件差错图echarts
+function scatterEcharts(){
+	var scatterChart = echarts.init(document.getElementById("echarts-scatter-chart"));
+	var scatteroption = {
+	    title : {
+	    	text : '差错率',
+			show : true,
+			textStyle : {
+				fontWeight : 'normal',
+				fontSize : 15,
+			}
+	    },
+	    tooltip : {
+	        trigger: 'axis',
+	        showDelay : 0,
+	        axisPointer:{
+	            type : 'cross',
+	            lineStyle: {
+	                type : 'dashed',
+	                width : 1
+	            }
+	        }
+	    },
+	    legend: {
+	       
+	    },
+	    grid:{
+	        x:45,
+	        x2:40,
+	        y2:24
+	    },
+	    xAxis : [
+	        {
+	            type : 'value',
+	            scale:false, 
+	           axisLabel : {
+	                formatter: '{value}'
+	            }  
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            scale:true,
+	            axisLabel : {
+	                formatter: '{value} %'
+	            }
+	        }
+	    ],
+	    series : [
+	        {
+	            name:'差错率',
+	            type:'scatter',
+	            tooltip : {
+	                trigger: 'item',
+	                formatter : function (params) {
+	                    if (params.value.length > 1) {
+	                        return params.seriesName + ' :<br/>'
+	                           + params.value[0] + '件 '
+	                           + params.value[1] + '% ';
+	                    }
+	                    else {
+	                        return params.seriesName + ' :<br/>'
+	                           + params.name + ' : '
+	                           + params.value + '% ';
+	                    }
+	                }
+	            },
+	            data: [[174, 65.6], [18700000, 78.8]
+	            ],
+	            markPoint : {
+	                data : [
+	                    {type : 'max', name: '最大值'},
+	                    {type : 'min', name: '最小值'}
+	                ]
+	            },
+	            markLine : {
+	                data : [
+	                    {type : 'average', name: '平均值'}
+	                ]
+	            }
+	        }
+	    ]
+	};
+
+
+
 		 var t;//一个bug暂时这么解决一下
 			t = setTimeout(function (){
-				loadMonthData();
+				scatteroption.series[0].data=app.eventPercentGraphData;
+				scatterChart.setOption(scatteroption);
 			}, 1000);
-	}else{
-		loadMonthData();
-	}
-	
-	 
-	
-	
-</script>
+}
+
+
+//
 
 
 
-<script type="text/javascript" charset="utf-8">
-var scatterChart = echarts.init(document.getElementById("echarts-scatter-chart"));
-var scatteroption = {
-    title : {
-    	text : '差错率',
-		show : true,
-		textStyle : {
-			fontWeight : 'normal',
-			fontSize : 15,
-		}
-    },
-    tooltip : {
-        trigger: 'axis',
-        showDelay : 0,
-        axisPointer:{
-            type : 'cross',
-            lineStyle: {
-                type : 'dashed',
-                width : 1
-            }
-        }
-    },
-    legend: {
-       
-    },
-    grid:{
-        x:45,
-        x2:40,
-        y2:24
-    },
-    xAxis : [
-        {
-            type : 'value',
-            scale:false, 
-           axisLabel : {
-                formatter: '{value}'
-            }  
-        }
-    ],
-    yAxis : [
-        {
-            type : 'value',
-            scale:true,
-            axisLabel : {
-                formatter: '{value} %'
-            }
-        }
-    ],
-    series : [
-        {
-            name:'差错率',
-            type:'scatter',
-            tooltip : {
-                trigger: 'item',
-                formatter : function (params) {
-                    if (params.value.length > 1) {
-                        return params.seriesName + ' :<br/>'
-                           + params.value[0] + '件 '
-                           + params.value[1] + '% ';
-                    }
-                    else {
-                        return params.seriesName + ' :<br/>'
-                           + params.name + ' : '
-                           + params.value + '% ';
-                    }
-                }
-            },
-            data: [[174, 65.6], [18700000, 78.8]
-            ],
-            markPoint : {
-                data : [
-                    {type : 'max', name: '最大值'},
-                    {type : 'min', name: '最小值'}
-                ]
-            },
-            markLine : {
-                data : [
-                    {type : 'average', name: '平均值'}
-                ]
-            }
-        }
-    ]
-};
-
-
-
-	 var t;//一个bug暂时这么解决一下
-		t = setTimeout(function (){
-			scatteroption.series[0].data=app.eventPercentGraphData;
-			scatterChart.setOption(scatteroption);
-		}, 1000);
-
-</script>
-
-<script type="text/javascript">
-
-var obj=document.getElementById("echarts-pie-chart-syy")
-
-obj.style.width = window.innerWidth+'px';
-obj.style.height = obj.parentNode.innerHeight+'px';
-
-var pieChart_syy = echarts.init(obj);
-var pieoption_syy = {
-    title : {
-        text: '防损事件占比',
-        subtext: '',
-        x:'center'
-    },
-    tooltip : {
-        trigger: 'item',
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    legend: {
-        orient : 'vertical',
-        x : 'left',
-        data:['正常事件','防损事件']
-    },
-    calculable : true,
-    series : [
-        {
-            name:'访问来源',
-            type:'pie',
-            radius : '55%',
-            center: ['50%', '60%'],
-            data:[
-                {value:335, name:'正常事件'},
-                {value:310, name:'防损事件'},
-                /* {value:310, name:'邮件营销'},
-                {value:234, name:'联盟广告'},
-                {value:135, name:'视频广告'},
-                {value:1548, name:'搜索引擎'} */
-            ]
-        }
-    ]
-};
-pieChart_syy.setOption(pieoption_syy);
+window.onload=function(){
+	//alert(getQueryString("usrID"));
+	eventEcharts();
+	scatterEcharts();
+}
 
 
 </script>
 
-<script type="text/javascript">
-var obj=document.getElementById("echarts-pie-chart-fsy")
-
-obj.style.width = window.innerWidth+'px';
-obj.style.height = obj.parentNode.innerHeight+'px';
-
-var pieChart_fsy = echarts.init(obj);
-var pieoption_fsy = {
-    title : {
-        text: '事件结果分布',
-        subtext: '',
-        x:'center'
-    },
-    tooltip : {
-        trigger: 'item',
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    legend: {
-        orient : 'vertical',
-        x : 'left',
-        data:['漏扫事件','补扫事件']
-    },
-    calculable : true,
-    series : [
-        {
-            name:'访问来源',
-            type:'pie',
-            radius : '55%',
-            center: ['50%', '60%'],
-            data:[
-                {value:335, name:'漏扫事件'},
-                {value:220, name:'补扫事件'},
-                /* {value:310, name:'邮件营销'},
-                {value:234, name:'联盟广告'},
-                {value:135, name:'视频广告'},
-                {value:1548, name:'搜索引擎'} */
-            ]
-        }
-    ]
-};
-
-	
-
-pieChart_fsy.setOption(pieoption_fsy);
+</body>
 
 
-</script>
+
+
+
+
+
+
+
+
+
+
 
 
 
