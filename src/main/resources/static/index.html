@@ -253,11 +253,21 @@
 //alert(usrID)
 //const serverPath="http://localhost:8080";
 
-function getQueryString(name) { 
+function getQueryString(name) {//从url中根据参数名获取参数 
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
 	var r = window.location.search.substr(1).match(reg); 
 	if (r != null) return unescape(r[2]); return null; 
 } 
+
+function contains(arr, obj) {//判断数组中是否存在某元素
+    var i = arr.length;  
+    while (i--) {  
+        if (arr[i] === obj) {  
+            return true;  
+        }  
+    }  
+    return false;  
+}
 
 //alert(getQueryString("usrID"));
 const serverPath=getQueryString("serverPath");//获取服务端ip和端口号
@@ -289,6 +299,7 @@ var usrName=getQueryString("usrName");
 			eventsStatus1:[],//暂存事件
 			eventsStatus2:[],//完成事件
 			eventsForThisWeek:[],//按周统计
+			eventsForThisMonth:[],//按月统计每天数据
 			
 			
 			
@@ -346,6 +357,8 @@ var usrName=getQueryString("usrName");
 			
 			loadingPage:true,//页面载入动画
 			
+			eventActioned:[],//临时村放已经有防损员接管的事件id  减小服务器的压力
+			
 			
 			
 		},
@@ -402,11 +415,13 @@ var usrName=getQueryString("usrName");
                     	_self.eventsStatus2=data.eventsStatus2;
                     	//加载周事件  （防损员huo防损经理）
                     	_self.eventsForThisWeek=data.eventsForThisWeek;
+                    	_self.eventsForThisMonth=data.eventsForThisMonth;
+                    	console.log(data.eventsForThisWeek)
                     	//登陆页面后 默认先加载未处理事件
                     	_self.selectedEvents=data.eventsStatus0;
                     	//默认用户进来先选择了 未处理事件列表
                     	_self.wclDivClick();
-                    	
+                    	_self.loadingPage=false;
                     	//如果是防损员及 roleId=1 时  判断是否关联款台（本月）
                     	
                     	
@@ -523,10 +538,20 @@ var usrName=getQueryString("usrName");
 			},
 			getMoreEvent:function(){
 				console.log("selectedEvent:"+this.selectedEvents.length)
-				 this.managerPage=false;
-				this.eventListPage=true;
-				this.back_button=true;
-				this.title+='s';
+				
+				var _self=this;
+				
+				 this.loadingPage=true;
+				
+				var t;
+				t=setTimeout(function(){
+					_self.managerPage=false;
+					_self.eventListPage=true;
+					_self.back_button=true;
+					_self.title+='s';
+					_self.loadingPage=false;
+				},300);
+				
 			},
 			back:function(){
 				this.managerPage=true;
@@ -681,21 +706,10 @@ var usrName=getQueryString("usrName");
 				
 				//控制表单是否可编辑
 				this.disabled=!this.detailBtnShow;
-				
-				if(event.result==''){
-					mui.toast('请选择审核结论');
-				}else if(event.comment==''||event.productName==''){
-					mui.toast('请补全事件详细信息');
-				}else{
-					
-				}
 				//处理标题
 				this.title='14s';
-				var _self=this;
-				var t;
-				t=setTimeout(function(){
-					_self.createActionTime(event.id);
-				},2000);
+				//后台生成事件 执行的开始时间
+				this.createActionTime(event);
 				
 			},	
 			saveEditResult:function(event){
@@ -775,7 +789,7 @@ var usrName=getQueryString("usrName");
 						
 						
 						
-						mui.ajax({//向服务器获取款台数据
+						mui.ajax({//
 							url : serverPath+"/saveEditResult",
 		                    type : 'post',
 		                    headers: {
@@ -792,12 +806,13 @@ var usrName=getQueryString("usrName");
 		                    timeout : 10000,
 		                    success : function(data){
 		                    	if(data.status==0){
-		                      		mui.toast('提交成功');
+		                      		//mui.toast('提交成功');
 		                      		//跳转到manager页面  重载event数据  和 counter数据
 		                      		_self.loadEventCount();
 		                      		_self.loadCounterListData();
 		                      		_self.back();
-		                      		
+		                      		//如果事件提交成功  后台生成事件endTime
+		                      		_self.createEndTime(event);
 		                      	}
 		                    },
 		                    error : function(xhr,type,errorThrown){
@@ -810,32 +825,31 @@ var usrName=getQueryString("usrName");
 					}else{
 						mui.toast('补全所有信息才能提交喔');
 					}
-					
-					
 					break;
-					
 				default:
-					
 					break;
-				
-				
 				}
-				
-					
-					
-				
-				
-				
-								
 			},
 			watchEditChange:function(){
 				if(this.detailEvent.result.length!=0){
 					this.saveEditDisabled=true;
 				}
 			},
-			createActionTime : function(eventId){
+			createActionTime : function(event){
 				
 				var _self=this;
+				
+				if(!_self.detailBtnShow||contains(_self.eventActioned,event.id)||_self.detailBtn=='提交'){//如果临时缓存中存在  不执行ajax请求
+					if(event.result==''){
+						mui.toast('请选择审核结论');
+					}else if(event.comment==''||event.productName==''){
+						mui.toast('请补全事件详细信息');
+					}else{
+						
+					} 
+					console.log('缓存中存在！不执行ajax！')
+					return;
+				}
 				
 				mui.ajax({
 					url:serverPath+"/createActionTime",
@@ -844,21 +858,77 @@ var usrName=getQueryString("usrName");
 						'Content-Type':'application/x-www-form-urlencoded'
 					},
 					data:{
-						"event_id":eventId,
-						"process_person_id":_self.usrID
+						"event_id":event.id,
+						"process_person_id":_self.usrID,
+						"shop_id":_self.shopID,
+						"usrID":_self.usrID,
+						"roleId":_self.roleId,
+						"areaId":_self.areaID,
+						"usrName":_self.usrName
 					},
 					timeout:10000,
 					success:function(data){
+						//console.log("createActionTime-data:"+data)
 						if(data.status=='0'){
-							mui.toast("您于"+data.actionTime+"接管了该防损事件")
-						}else{
+							//将该事件id村放到页面临时缓存中
+							_self.eventActioned.push(event.id);
+							console.log("eventActioned："+_self.eventActioned.length);
 							
+							mui.alert("您于"+data.actionTime+"接管了该防损事件,请尽快处理", '系统提示', function() {
+								if(event.result==''){
+									mui.toast('请选择审核结论');
+								}else if(event.comment==''||event.productName==''){
+									mui.toast('请补全事件详细信息');
+								}else{
+									
+								}
+			                });
+						}else if(data.status=='1'){
+							if(event.result==''){
+								mui.toast('请选择审核结论');
+							}else if(event.comment==''||event.productName==''){
+								mui.toast('请补全事件详细信息');
+							}else{
+								
+							}
 						}
 					},
 					error:function(xhr,type,errorThrown){
 						console.log(xhr+'\n'+type+'\n'+errorThrown)
 					}
 					
+				});
+			},
+			createEndTime:function(event){
+				
+				var _self=this;
+				
+				console.log('createEntime...eventId:'+event.id)
+				mui.ajax({
+					url:serverPath+"/createEndTime",
+					type:"post",
+					headers:{
+						"Content-Type":"application/x-www-form-urlencoded"
+					},
+					data:{
+						"event_id":event.id,
+						"shop_id":_self.shopID,
+						"usrID":_self.usrID,
+						"roleId":_self.roleId,
+						"areaId":_self.areaID,
+						"usrName":_self.usrName
+					},
+					timeout:10000,
+					success:function(data){
+						if(data.status=='0'){
+							mui.alert("结果提交成功!\n本次事件处理耗时:"+data.eventTime,"系统提示",function(){
+								
+							});
+						}
+					},
+					error:function(xhr,type,errorThrown){
+						console.log(xhr+'\n'+type+'\n'+errorThrown);
+					}
 				});
 			},
 			
@@ -882,7 +952,7 @@ var usrName=getQueryString("usrName");
 			this.loadCounterListData();
 			this.wclDivClick();
 			
-			this.loadingPage=false;
+			//this.loadingPage=false;
 			
 			
 			//alert('load success'+this.usrID)
@@ -956,6 +1026,8 @@ var usrName=getQueryString("usrName");
 
 <script type="text/javascript" charset="utf-8">
 //alert(usrID)
+
+
 	var eventChart = echarts.init(document.getElementById('eventChart'));
 
 	option = {
@@ -981,7 +1053,7 @@ var usrName=getQueryString("usrName");
 			containLabel : true,
 			show : true
 		},
-		toolbox : {
+		/* toolbox : {
 			itemSize : 25,
 			feature : {
 				myTool1 : {
@@ -1012,7 +1084,7 @@ var usrName=getQueryString("usrName");
 				}
 			},
 
-		},
+		}, */
 		xAxis : {
 			type : 'category',
 			boundaryGap : false,
@@ -1035,8 +1107,36 @@ var usrName=getQueryString("usrName");
 	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/周.svg';
 	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/日.svg';
 	//alert(option.toolbox.feature.myTool1.icon)
+	
 
-	eventChart.setOption(option);
+	
+	var echartTimer;
+	echartTimer=setTimeout(function(){
+		
+		if(roleId=='1'){
+			option.series[0].data=app.eventsForThisWeek;
+			console.log("echarts-week:"+app.eventsForThisWeek)
+			eventChart.setOption(option);
+		}else{
+			var date = new Date(); 
+		     var year = date.getFullYear();
+		     var month = date.getMonth()+1;
+		     var d = new Date(year, month, 0);
+		     var monthNum =d.getDate();
+			
+		     option.xAxis.data=[];
+		     
+		     for(var i=0;i<monthNum;i++){
+		    	 var temp=(i+1)+'日';
+		    	 option.xAxis.data.push(temp);
+		     }
+			option.series[0].data=app.eventsForThisMonth;
+			console.log("echarts-month:"+app.eventsForThisMonth)
+			eventChart.setOption(option);
+		}
+		
+		
+	},1000);
 </script>
 
 

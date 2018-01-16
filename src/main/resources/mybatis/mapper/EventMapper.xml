@@ -63,6 +63,15 @@
  		 
 	</select>  
 	
+	<!-- 根据该天日期统计该天事件次数防损经理 -->
+	<select id="countEventThisDayForFsjl" parameterType="java.util.Map" resultType="java.lang.Integer" >
+
+         SELECT count(e.id) from events e LEFT JOIN counters c ON e.RegID=c.id LEFT JOIN 
+		shops s ON c.shopId=s.id  where s.id=#{shopId} and to_days(e.date)
+ 		 =to_days(#{weekDate}) 
+ 		 
+	</select>
+	
 	<!-- 根据该天日期统计该天24小时事件次数 区域经理 -->
 	<select id="countEventThisHour" parameterType="java.util.Map" resultType="java.lang.Integer" >
 

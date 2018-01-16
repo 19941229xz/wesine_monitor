@@ -38,10 +38,14 @@ public interface EventMapper {
 	List<Map<String, Object>> selectEventByStatus3(Map<String, Object> conditionMap);
 
 	int updateById(Map<String, Object> conditionMap);
+	
+	int countEventThisDayForFsjl(Map<String, Object> conditionMap);//for 防损经理 
 
-	int countEventThisDay(Map<String, Object> conditionMap);
+	int countEventThisDay(Map<String, Object> conditionMap);//for 区域经理
 
-	int countEventThisDay2(Map<String, Object> conditionMap);
+	int countEventThisDay2(Map<String, Object> conditionMap);//for 防损经理
+	
+	int countEventThisDay3(Map<String, Object> conditionMap);//for  防损员
 
 	int countEventThisHour(Map<String, Object> conditionMap);
 	
@@ -65,5 +69,15 @@ public interface EventMapper {
 	
 	
 	int updateEventTAT(Map<String,Object> map);
+	
+	
+	@Select("select * from events where id=#{event_id}")
+	List<Map<String,Object>> getEventById(String event_id);
+	
+	@Select("select * from eventTAT where event_id=#{event_id}")
+	List<Map<String,Object>> getEventTATById(String event_id);
+	
+	
+	
 
 }

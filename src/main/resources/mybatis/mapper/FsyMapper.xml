@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wesine.dao.FsyMapper">
+
+	<update id="updateFsy">
+
+		update fsyInfo
+		<trim prefix="set" suffixOverrides=",">
+
+			<if test="actionEventNum !=null">actionEventNum=#{actionEventNum},</if>
+			<if test="avgActionTime !=null">avgActionTime=#{avgActionTime},</if>
+			<if test="shopId !=null">shopId=#{shopId},</if>
+			<if test="roleId !=null">roleId=#{roleId},</if>
+			<if test="userName !=null">userName=#{userName},</if>
+
+		</trim>
+		where userId=#{usrID}
+
+	</update>
+
+
+
+</mapper>
