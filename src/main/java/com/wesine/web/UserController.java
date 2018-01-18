@@ -2,6 +2,7 @@ package com.wesine.web;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,29 +17,40 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import com.wesine.dao.CashierMapper;
 import com.wesine.dao.CounterMapper;
 import com.wesine.dao.FsyMapper;
+import com.wesine.dao.ShopMapper;
 import com.wesine.dao.UserMapper;
 import com.wesine.model.User;
+import com.wesine.util.TimeUtil;
 
 @Controller
 public class UserController {
 	
 	
 	private Map<String,Object> conditionMap;
+	
+	private Map<String,Object> resultMap;
+	
+	private List<Map<String,Object>> listMap;
 
 	@Autowired
 	UserMapper userMapper;
-	
 	@Autowired
 	CounterMapper counterMapper;
 	@Autowired
 	FsyMapper fsyMapper;
+	@Autowired
+	CashierMapper cashierMapper;
+	@Autowired
+	ShopMapper shopMapper;
 
 	@RequestMapping(value = "/users")
 	@ResponseBody
@@ -121,11 +133,31 @@ public class UserController {
 			//users表中生成user数据  自动注册
 			userMapper.insert(conditionMap);
 			
-			if(judgeNum.equals("2")){//如果新注册角色微防损员  生成防损员基本信息  主键还是userid、
+			if(judgeNum.equals("2")){//如果新注册角色为防损员  生成防损员基本信息  主键还是userid
+				conditionMap.put("shopName", shopMapper.getShopNameByID(conditionMap.get("shopId")+""));
+				
 				fsyMapper.insertFsy(conditionMap);
 				System.out.println("新增加一防损员信息！");
-				
 			}
+			
+			/*switch(judgeNum){
+			case "2"://如果新注册角色为防损员  生成防损员基本信息  主键还是userid
+				fsyMapper.insertFsy(conditionMap);
+				System.out.println("新增加一防损员信息！");
+				break;
+			case "3"://注册防损经理
+				
+				
+				System.out.println("新增加一防损经理信息！");
+				break;
+			case "4":
+				
+				break;
+			default:
+				
+				break;
+			
+			}*/
 		}
 		
 		if(roleId.equals("1")&&counterMapper.countUserCounter(usrID)==0){//if roleId =0 is 防损员  查询是否关联款台
@@ -157,7 +189,38 @@ public class UserController {
 	
 	
 	
+	@RequestMapping(value="/getFsyAndSyyList")
+	@ResponseBody
+	public Map<String,Object> getFsyAndSyyList(@RequestParam Map<String,Object> params){/* roleId : that.roleId, areaID : that.areaID, usrName : that.usrName, usrID: that.usrID */
 	
+		resultMap=new HashMap<String,Object>();
+		
+		resultMap.put("status", "0");
+		
+		//listMap=new ArrayList<Map<String,Object>>();//村放防损员list
+		
+		listMap=fsyMapper.getAllFsy(params);
+		
+		if(listMap==null||listMap.size()==0){
+			resultMap.put("status", "1");//防损员数据为空  或请求失败
+		}else{
+			for (Map<String, Object> map : listMap) {//long ms  转换微  时分秒
+				map.put("avgActionTime", TimeUtil.longTime2StringTime(Long.parseLong(map.get("avgActionTime")+"")));
+			}
+			resultMap.put("fsyList", listMap);
+		}
+		
+		listMap=cashierMapper.getAllCashiers(params);
+		
+		if(listMap==null||listMap.size()==0){
+			resultMap.put("status", "2");//收银员数据为空  或请求失败
+		}else{
+			resultMap.put("syyList", listMap);
+		}
+		
+		
+		return resultMap;
+	}
 	
 	
 	

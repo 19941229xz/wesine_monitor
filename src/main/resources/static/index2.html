@@ -14,7 +14,10 @@
 <script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>   
 
 <style type="text/css">
-
+.tab-active{
+				background-color:#5D9CEC;
+				color:white;
+			}
 /*toast信息提示*/
 .mui-toast-container {bottom: 50% !important;}
 .mui-toast-message {opacity: 0.6; color: #fff; width: 250px; padding: 10px 5px 10px 5px;font-size:20px;}
@@ -27,10 +30,12 @@
 .mui-control-content {
 				height: 150px;
 			}
-.mui-segmented-control .mui-control-item.mui-active {
+ .mui-segmented-control .mui-control-item.mui-active {
     color: white;
     background-color: #5D9CEC;
-}
+} 
+
+
 .mui-segmented-control .mui-control-item{
 border-color: #5D9CEC;
 }
@@ -60,6 +65,8 @@ border-color: #5D9CEC;
 			.table td{
 				text-align: center;
 			}
+			
+			
 
 </style>
 
@@ -115,107 +122,56 @@ border-color: #5D9CEC;
 			
 			<div style="padding: 10px 10px;">
 				<div id="segmentedControl" class="mui-segmented-control">
-					<a class="mui-control-item" >收银员</a>
-					<a class="mui-control-item" >防损员</a>
+					<a @tap="tabClick($event)" v-bind:class="{'mui-control-item':true,'mui-active': syyActive }" >收银员</a>
+					<a @tap="tabClick($event)" v-bind:class="{'mui-control-item':true,'mui-active': !syyActive }" >防损员</a>
 				</div>
-				<div id="segmentedControl" class="mui-segmented-control" style="margin-top: 10px;">
+				<!-- <div id="segmentedControl" class="mui-segmented-control" style="margin-top: 10px;">
 					<a class="mui-control-item" >本周</a>
 					<a class="mui-control-item" >本月</a>
 					<a class="mui-control-item" >近三个月</a>
 					<a class="mui-control-item" >近半年</a>
-				</div>
+				</div> -->
 			</div>
 			
 			<div>
-				<div class="mui-control-content mui-active">
+				<div class="mui-control-content " v-bind:class="{'mui-active':syyActive}">
 					<div id="scroll" class="mui-scroll-wrapper">
 						<div class="mui-scroll">
 							<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
 								<tr>
-									<th width=25%>收银员</th>
-									<th width=25%>收银次数</th>
-									<th width=25%>事件次数</th>
-									<th width=25%>出错率</th>
+								<th width=20%>排名</th>
+									<th width=20%>收银员</th>
+									<th width=20%>收银次数</th>
+									<th width=20%>出错率</th>
+									<th width=20%>所属门店</th>
 								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
+								<tr v-for="(item, index) in syyList">
+									<td>{{index+1}}</td> 
+									<td>{{item.c_id}}</td>
+									<td>{{item.s_num}}</td> 
+									<td>{{(item.e_num / item.s_num) | toPercent}}</td>
+									<td>{{item.shop_name}}</td>
 								</tr>
 							</table>
 							
 						</div>
 					</div>
 				</div>
-				<div class="mui-control-content">
+				<div class="mui-control-content" v-bind:class="{'mui-active': !syyActive }">
 					<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
 								<tr>
+								<th width=20%>排名</th>
 									<th width=20%>防损员</th>
-									<th width=20%>事件次数</th>
-									<th width=20%>三分钟内</th>
-									<th width=20%>五分钟内</th>
-									<th width=20%>五分钟以上</th>
+									<th width=20%>处理事件</th>
+									<th width=20%>平均处理时间</th>
+									<th width=20%>所属门店</th>
 								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td> 
-									<td>12</td>
-									<td>12</td>
+								<tr v-for="(item, index) in fsyList">
+									<td>{{index+1}}</td> 
+									<td>{{item.userName}}</td>
+									<td>{{item.actionEventNum}}</td> 
+									<td>{{item.avgActionTime}}</td>
+									<td>{{item.shopName}}</td>
 								</tr>
 							</table>
 				</div>
@@ -287,8 +243,8 @@ var app = new Vue({
 		eventsForThisMonth:[],//按月统计
 		eventPercentGraphData:[],//差错图数据
 		
-		clzNum:0,
-		ywcNum:0,
+		clzNum : 0,
+		ywcNum : 0,
 		
 		shopList:[],//区域关联门店列表
 		
@@ -300,6 +256,12 @@ var app = new Vue({
 		optBtn : true,//右上角菜单按钮
 		
 		chooseShop:[],//被选中的商店
+		
+		syyActive : true,//是否显示收银员排行
+		fsyActive : false,//是否显示防损员排行
+		
+		fsyList:[],
+		syyList:[],
 		
 		
 		
@@ -450,12 +412,60 @@ var app = new Vue({
 			this.backBtn=false;
 			this.optBtn=true;
 		},
-		saveShop:function(){
-			this.toMain();
+		saveShop:function(){//未完成
+			
+			//console.log(this.chooseShop.)
+			
+			/* this.toMain();
 			var t;
 			t=setTimeout(function(){
 				mui.toast('保存成功！')
-			},500)
+			},500) */
+			
+		},
+		tabClick:function(event){
+			//css 操作
+			console.log("切换到"+event.target.innerHTML+"tab!");
+			var str=event.target.innerHTML;
+			this.syyActive=str=='收银员'?true:false;
+			//data 操作 
+			/* if(){
+				
+			} */
+			
+		},
+		getFsyAndSyyList : function(){//获取防损员 收银员 列表数据
+			
+			var that=this;
+			
+			mui.ajax({
+				url:serverPath+'/getFsyAndSyyList',
+				type:'post',
+				headers:{
+					'Content-Type':'application/x-www-form-urlencoded'
+				},
+				data:{
+					roleId : that.roleId,
+					areaID : that.areaID,
+					usrName : that.usrName,
+					usrID: that.usrID
+				},
+				timeout:10000,
+				success:function(data){
+					
+					if(data.status=='0'){
+						console.log('防损员收银员排行数据获取成功！');
+						that.fsyList=data.fsyList;
+						that.syyList=data.syyList;
+					}
+					
+					
+				},
+				error:function(xhr,type,errorThrown){
+					console.log('请求失败:'+xhr+'\n'+type+'\n'+errorThrown);
+				}
+			});
+			
 			
 		},
 			
@@ -464,6 +474,12 @@ var app = new Vue({
 			this.loadUserInfo();
 			this.loadEventCount();
 			this.loadShopList();
+			this.getFsyAndSyyList();
+		},
+		filters:{
+			toPercent:function(value){
+				return value.toFixed(2)+'%';
+			}
 		},
 	});
 	
@@ -575,26 +591,30 @@ var eventChart = echarts.init(document.getElementById('eventChart'));
 	
 	
 	
-	var t;//一个bug暂时这么解决一下
-	t = setTimeout(function (){
-option.series[0].data=app.eventsForThisMonth;
-		
-		var date = new Date();
-	     var year = date.getFullYear();
-	     var month = date.getMonth()+1;
-	     var d = new Date(year, month, 0);
-	     var monthNum =d.getDate();
-		
-	     option.xAxis.data=[];
-	     
-	     for(var i=0;i<monthNum;i++){
-	    	 var temp=(i+1)+'日';
-	    	 option.xAxis.data.push(temp);
-	     }
-		
-		
-		eventChart.setOption(option);
-	}, 1000);
+	var eventDsq;
+	var eventDsqCount=0;
+	eventDsq=setInterval(function(){
+		if(typeof(app.eventsForThisMonth)=='undefined'||app.eventsForThisMonth==null||app.eventsForThisMonth.length==0){
+			
+		}else{
+			option.series[0].data=app.eventsForThisMonth;
+			var date = new Date();
+		     var year = date.getFullYear();
+		     var month = date.getMonth()+1;
+		     var d = new Date(year, month, 0);
+		     var monthNum =d.getDate();
+		     option.xAxis.data=[];
+		     for(var i=0;i<monthNum;i++){
+		    	 var temp=(i+1)+'日';
+		    	 option.xAxis.data.push(temp);
+		     }
+			eventChart.setOption(option);
+			console.log('s事件图加载时间:'+(++eventDsqCount)*20+'ms!');
+			window.clearInterval(eventDsq);
+		}
+	},20);
+	
+
 	
 	
 }
@@ -684,13 +704,23 @@ function scatterEcharts(){
 	    ]
 	};
 
+				var scatDsq;
+				var scatDsqCount=0;
+				scatDsq=setInterval(function(){
+					
+					if(typeof(app.eventPercentGraphData)=='undefined'||app.eventPercentGraphData==null||app.eventPercentGraphData.length==0){
+						
+					}else{
+						
+						scatteroption.series[0].data=app.eventPercentGraphData;
+						scatterChart.setOption(scatteroption);
+						console.log('差错图加载时间:'+(++scatDsqCount)*20+'ms!');
+						window.clearInterval(scatDsq);
+					}
+					
+				},20);
 
-
-		 var t;//一个bug暂时这么解决一下
-			t = setTimeout(function (){
-				scatteroption.series[0].data=app.eventPercentGraphData;
-				scatterChart.setOption(scatteroption);
-			}, 1000);
+				
 }
 
 

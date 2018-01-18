@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface FsyMapper {
 
-	@Insert("insert into fsyInfo (userId,shopId,roleId,userName)values(#{usrID},#{shopId},#{roleId},#{usrName})")
+	@Insert("insert into fsyInfo (userId,shopId,roleId,userName,shopName)values(#{usrID},#{shopId},#{roleId},#{usrName},#{shopName})")
 	int insertFsy(Map<String,Object> map);//新增防损员信息
 	
 	
@@ -18,6 +18,9 @@ public interface FsyMapper {
 	
 	@Select("select * from fsyInfo where userId=#{userId}")
 	List<Map<String,Object>> getFsyById(String userId);
+
+
+	List<Map<String, Object>> getAllFsy(Map<String, Object> params);//根据区域经理的信息  获取防损员list
 	
 	
 }

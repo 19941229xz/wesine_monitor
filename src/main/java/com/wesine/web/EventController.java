@@ -199,6 +199,8 @@ public class EventController {
 		
 		resultMap.put("status", "1");//默认失败
 		
+		long time=0;
+		
 		List<Map<String ,Object>> listEventTAT=eventMapper.getEventTATById(params.get("event_id")+"");
 		
 		if(listEventTAT.size()!=0&&Long.parseLong(listEventTAT.get(0).get("actionTime")+"")!=0){
@@ -206,7 +208,7 @@ public class EventController {
 			long start=Long.parseLong(listEventTAT.get(0).get("actionTime")+"");//以开始执行微时间起点
 			long end=System.currentTimeMillis();
 			
-			long time=end-start;
+			time=end-start;
 			
 			resultMap.put("eventTime", TimeUtil.longTime2StringTime(time));
 			
@@ -230,8 +232,15 @@ public class EventController {
 			if(fsyList.size()==0){//不存在  该用户的fsy信息  需要重新生成
 				fsyMapper.insertFsy(params);
 			}else{//存在的情况
-				int num=(int)(fsyList.get(0).get("actionEventNum"));
-				params.put("actionEventNum", ++num);
+				long num=Long.parseLong(fsyList.get(0).get("actionEventNum")+"");
+				params.put("actionEventNum", ++num);//处理事件数加1 
+				
+				long num2=Long.parseLong(fsyList.get(0).get("avgActionTime")+"");
+				
+				long newAvgTime=((num*num2)+time)/(num+1);//重新计算平均处理时间
+				
+				params.put("avgActionTime", newAvgTime);
+				
 				fsyMapper.updateFsy(params);
 			}
 			

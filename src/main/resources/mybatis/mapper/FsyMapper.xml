@@ -3,20 +3,26 @@
 <mapper namespace="com.wesine.dao.FsyMapper">
 
 	<update id="updateFsy">
-
 		update fsyInfo
 		<trim prefix="set" suffixOverrides=",">
-
 			<if test="actionEventNum !=null">actionEventNum=#{actionEventNum},</if>
 			<if test="avgActionTime !=null">avgActionTime=#{avgActionTime},</if>
 			<if test="shopId !=null">shopId=#{shopId},</if>
 			<if test="roleId !=null">roleId=#{roleId},</if>
 			<if test="userName !=null">userName=#{userName},</if>
-
 		</trim>
 		where userId=#{usrID}
-
 	</update>
+	
+	
+	
+	<select id="getAllFsy" resultType="java.util.Map">
+		select f.* from fsyInfo f,shops s,areas a WHERE f.shopId=s.id and s.areaId=a.id 
+			<if test="areaID !=null or areaID !=''">
+				and a.id=#{areaID}
+			</if>
+		ORDER BY f.avgActionTime asc	
+	</select>
 
 
 

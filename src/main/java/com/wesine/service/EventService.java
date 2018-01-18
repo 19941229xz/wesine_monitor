@@ -184,31 +184,31 @@ public class EventService {
 		// 获取当前周 周一的日期
 		cal.set(cal.DAY_OF_WEEK, cal.MONDAY);
 		String week1 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周一日期：" + week1);
+		//System.out.println("当前时间所在周周一日期：" + week1);
 		// 获取当前周 周2的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week2 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week2);
+//		System.out.println("当前时间所在周周日日期：" + week2);
 		// 获取当前周 周3的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week3 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week3);
+//		System.out.println("当前时间所在周周日日期：" + week3);
 		// 获取当前周 周4的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week4 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week4);
+//		System.out.println("当前时间所在周周日日期：" + week4);
 		// 获取当前周 周5的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week5 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week5);
+//		System.out.println("当前时间所在周周日日期：" + week5);
 		// 获取当前周 周6的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week6 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week6);
+//		System.out.println("当前时间所在周周日日期：" + week6);
 		// 获取当前周 周日的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week7 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week7);
+//		System.out.println("当前时间所在周周日日期：" + week7);
 
 		arr[0] = getEventNumByWeekDay2(week1, shopID);
 		arr[1] = getEventNumByWeekDay2(week2, shopID);
@@ -231,31 +231,31 @@ public class EventService {
 		// 获取当前周 周一的日期
 		cal.set(cal.DAY_OF_WEEK, cal.MONDAY);
 		String week1 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周一日期：" + week1);
+//		System.out.println("当前时间所在周周一日期：" + week1);
 		// 获取当前周 周2的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week2 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week2);
+//		System.out.println("当前时间所在周周日日期：" + week2);
 		// 获取当前周 周3的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week3 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week3);
+//		System.out.println("当前时间所在周周日日期：" + week3);
 		// 获取当前周 周4的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week4 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week4);
+//		System.out.println("当前时间所在周周日日期：" + week4);
 		// 获取当前周 周5的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week5 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week5);
+//		System.out.println("当前时间所在周周日日期：" + week5);
 		// 获取当前周 周6的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week6 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week6);
+//		System.out.println("当前时间所在周周日日期：" + week6);
 		// 获取当前周 周日的日期
 		cal.set(Calendar.DATE, cal.get(cal.DATE) + 1);
 		String week7 = simdf.format(cal.getTime());
-		System.out.println("当前时间所在周周日日期：" + week7);
+//		System.out.println("当前时间所在周周日日期：" + week7);
 
 		arr[0] = getEventNumByWeekDay3(week1, usrID);
 		arr[1] = getEventNumByWeekDay3(week2, usrID);

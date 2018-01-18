@@ -6,7 +6,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport"
 	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Insert title here</title>
+<title>微晟银线防损</title>
 <script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
 <link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css"
 	rel="stylesheet"></link>
@@ -29,7 +29,7 @@
 	<div id="app">
 	
 	<div v-show="loadingPage" style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
-		<img  style="margin-top: 230px;"  alt="" src="http://localhost:8080/static/img/loading.gif">
+		<img  style="margin-top: 230px;"  alt="" src="http://111.231.76.125:8080/static/img/loading.gif">
 	</div>
 	
 		<header class="mui-bar mui-bar-nav">
@@ -59,10 +59,10 @@
 
 	<ul class="mui-table-view"
 				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
-				<li v-for="item in selectedEvents" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
+				<li v-for="item in selectedEvents.slice(0, finalNum )" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
 					href="javascript:;"> <img
 						class="mui-media-object mui-pull-left"
-						src="http://placehold.it/40x30"></img>
+						:src="item.PictureUrl0"></img>
 						<div class="mui-media-body">
 							<p class="mui-ellipsis">{{item.date}} 交易单号:{{item.TransID}}</p>
 							<p class="mui-ellipsis">收银员ID:{{item.CashierID}} 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
@@ -86,8 +86,11 @@
 							<p class="mui-ellipsis">王XX 款台:5# 审查结果:</p>
 						</div>
 				</a></li> -->
-				<li v-on:tap="back" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
-					href="javascript:;"> 返回
+				<li v-show="morePageMoreBtn" v-on:tap="showMoreInMorePage" class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+					href="javascript:;"> 点击查看更多
+				</a></li> 
+				<li v-show="!morePageMoreBtn"  class="mui-table-view-cell mui-media" style="text-align: center;color:gray;border:solid 1px #D7D7DC;"><a
+					href="javascript:;"> 没有更多了
 				</a></li> 
 			</ul>
 </div>
@@ -177,10 +180,10 @@
 
 			<ul class="mui-table-view"
 				style="background-color: #F8F8F8; margin-top: 20px;" v-show="isEventListShow">
-				<li v-for="item in selectedEvents.slice(0, 3)" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
+				<li v-for="item in selectedEvents.slice(0, 3 )" v-on:tap="toDetailPage(item)" class="mui-table-view-cell mui-media"><a
 					href="javascript:;"> <img
 						class="mui-media-object mui-pull-left"
-						src="http://placehold.it/40x30"></img>
+						:src="item.PictureUrl0"></img>
 						<div class="mui-media-body">
 							<p class="mui-ellipsis">{{item.date}} 交易单号:{{item.TransID}}</p>
 							<p class="mui-ellipsis">收银员ID:{{item.CashierID}} 款台:{{item.RegID}} 审查结果:{{item.result}}</p>
@@ -269,6 +272,11 @@ function contains(arr, obj) {//判断数组中是否存在某元素
     return false;  
 }
 
+
+function testScroll(){
+	console.log('scroll');
+}
+
 //alert(getQueryString("usrID"));
 const serverPath=getQueryString("serverPath");//获取服务端ip和端口号
 var usrID=getQueryString("usrID");
@@ -277,7 +285,7 @@ var shopID=getQueryString("shopID");
 var areaID=getQueryString("areaID");
 var usrName=getQueryString("usrName");
 
-
+var vueWindow=window;
 
 //alert(location.hostname)
 /* document.onclick=function(){
@@ -294,6 +302,7 @@ var usrName=getQueryString("usrName");
 			usrID:'',
 			
 			title:'10',
+			finalNum:9,//默认点击更多时 最多加载9条
 			
 			eventsStatus0:[],//未处理事件
 			eventsStatus1:[],//暂存事件
@@ -352,6 +361,8 @@ var usrName=getQueryString("usrName");
 			saveEditDisabled:true,
 			detailBtn:'保存',//详情页  按钮文字
 			detailBtnShow:true,//详情页  按钮是否显示
+			morePageMoreBtn:true,//查看更多事件页面的  更多按钮
+			
 			
 			disabled: false,//详情页表单是否可点击
 			
@@ -462,15 +473,30 @@ var usrName=getQueryString("usrName");
 				this.detailBtnShow=true;
 				this.detailBtn='保存';
 				
-				console.log(this.selectedEvents.length)
-				if(this.selectedEvents.length==0){
-					this.noEventTip='没有未处置事件';
-					this.isEventListShow=false;
-					this.isNoEventShow=true;
-				}else{
-					this.isEventListShow=true;
-					this.isNoEventShow=false;
-				}
+				//console.log(this.selectedEvents.length)
+				var wcldsq;
+				var count=0;
+				var _self=this;
+				wcldsq=setInterval(function(){
+					console.log('wcldsq excute:'+(++count));
+					if(typeof(_self.selectedEvents)=='undefined'||_self.selectedEvents==null){
+						
+					}else{
+						if(_self.selectedEvents.length==0){
+							_self.noEventTip='没有未处置事件';
+							_self.isEventListShow=false;
+							_self.isNoEventShow=true;
+						}else{
+							_self.isEventListShow=true;
+							_self.isNoEventShow=false;
+						}
+						//取消定时器
+						vueWindow.clearInterval(wcldsq);
+					}
+					
+				},300);
+				
+				
 				
 				
 			},
@@ -550,7 +576,7 @@ var usrName=getQueryString("usrName");
 					_self.back_button=true;
 					_self.title+='s';
 					_self.loadingPage=false;
-				},300);
+				},10);
 				
 			},
 			back:function(){
@@ -931,11 +957,24 @@ var usrName=getQueryString("usrName");
 					}
 				});
 			},
+			showMoreInMorePage:function(){
+				this.finalNum+=9;
+			},
+			clearFinalNum:function(value){
+				  if(!value){
+					  this.finalNum=9;
+					  this.morePageMoreBtn=true;
+				  }else{
+					  if(this.selectedEvents.length<=9){
+						  this.morePageMoreBtn=false;
+					  }
+				  }
+			},
 			
 			
 			
 
-		},
+		},//methods  end
 		mounted : function() {
 			//alert("vue load ")
 			//加载隐藏域中的变量
@@ -950,7 +989,7 @@ var usrName=getQueryString("usrName");
 			
 			this.loadEventCount();
 			this.loadCounterListData();
-			this.wclDivClick();
+			//this.wclDivClick();
 			
 			//this.loadingPage=false;
 			
@@ -1006,8 +1045,11 @@ var usrName=getQueryString("usrName");
 			  },
 			  watchNumChange:function(value){
 				  
-			  },
-			}//过滤器 end
+			  }
+			},//过滤器 end
+			watch: {//vue  监听器  
+		        'eventListPage': 'clearFinalNum',//监听key变化  执行value函数 
+		    }
 	}) 
 </script>
 
@@ -1108,35 +1150,52 @@ var usrName=getQueryString("usrName");
 	//option.toolbox.feature.myTool1.icon='image://'+serverPath+'/static/img/日.svg';
 	//alert(option.toolbox.feature.myTool1.icon)
 	
-
+	var dsq;
+	var count=0;
+	dsq=setInterval(function(){
+		console.log('dsq excute：'+(++count));
+		
+			if(roleId=='1'){
+				
+				if(typeof(app.eventsForThisWeek)=="undefined"||app.eventsForThisWeek==null||app.eventsForThisWeek.length==0){
+					console.log("weekdata undefined!")
+					return;
+				}
+				
+				option.series[0].data=app.eventsForThisWeek;
+				//console.log("echarts-week:"+app.eventsForThisWeek)
+				eventChart.setOption(option);
+				//清楚dsq
+				window.clearInterval(dsq);
+			}else{
+				
+				if(typeof(app.eventsForThisMonth)=="undefined"||app.eventsForThisMonth==null||app.eventsForThisMonth.length==0){
+					console.log("monthdata undefined!")
+					return;
+				}
+				
+				var date = new Date(); 
+			     var year = date.getFullYear();
+			     var month = date.getMonth()+1;
+			     var d = new Date(year, month, 0);
+			     var monthNum =d.getDate();
+				
+			     option.xAxis.data=[];
+			     
+			     for(var i=0;i<monthNum;i++){
+			    	 var temp=(i+1)+'日';
+			    	 option.xAxis.data.push(temp);
+			     }
+				option.series[0].data=app.eventsForThisMonth;
+				//console.log("echarts-month:"+app.eventsForThisMonth)
+				eventChart.setOption(option);
+				//清楚dsq
+				window.clearInterval(dsq);
+			}
+		
+	},10)
 	
-	var echartTimer;
-	echartTimer=setTimeout(function(){
-		
-		if(roleId=='1'){
-			option.series[0].data=app.eventsForThisWeek;
-			console.log("echarts-week:"+app.eventsForThisWeek)
-			eventChart.setOption(option);
-		}else{
-			var date = new Date(); 
-		     var year = date.getFullYear();
-		     var month = date.getMonth()+1;
-		     var d = new Date(year, month, 0);
-		     var monthNum =d.getDate();
-			
-		     option.xAxis.data=[];
-		     
-		     for(var i=0;i<monthNum;i++){
-		    	 var temp=(i+1)+'日';
-		    	 option.xAxis.data.push(temp);
-		     }
-			option.series[0].data=app.eventsForThisMonth;
-			console.log("echarts-month:"+app.eventsForThisMonth)
-			eventChart.setOption(option);
-		}
-		
-		
-	},1000);
+	
 </script>
 
 

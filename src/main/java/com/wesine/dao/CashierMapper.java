@@ -1,5 +1,6 @@
 package com.wesine.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
@@ -24,6 +25,8 @@ public interface CashierMapper {
 	
 	@Insert("insert into cashiers (id,c_id,shop_id,shop_name)values(#{id},#{c_id},#{shop_id},#{shop_name})")
 	int insertCashier(Map<String,Object> map);
+
+	List<Map<String, Object>> getAllCashiers(Map<String, Object> params);
 	
 	
 }
