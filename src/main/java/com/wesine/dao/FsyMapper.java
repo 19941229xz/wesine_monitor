@@ -9,8 +9,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface FsyMapper {
-
-	@Insert("insert into fsyInfo (userId,shopId,roleId,userName,shopName)values(#{usrID},#{shopId},#{roleId},#{usrName},#{shopName})")
+	@Insert("insert into fsyInfo (userId,shopId,roleId,userName,shopName,actionEventNum)values(#{usrID},#{shopId},#{roleId},#{usrName},#{shopName},#{actionEventNum})")
 	int insertFsy(Map<String,Object> map);//新增防损员信息
 	
 	

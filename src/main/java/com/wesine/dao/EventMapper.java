@@ -76,6 +76,14 @@ public interface EventMapper {
 	
 	@Select("select * from eventTAT where event_id=#{event_id}")
 	List<Map<String,Object>> getEventTATById(String event_id);
+
+	int getEventTotalNumByStatus(Map<String, Object> params);
+
+	int getWclTotal(Map<String, Object> conditionMap);
+
+	int getZcTotal(Map<String, Object> conditionMap);
+
+	int getWcTotal(Map<String, Object> conditionMap);
 	
 	
 	

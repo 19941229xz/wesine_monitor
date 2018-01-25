@@ -187,16 +187,48 @@
  		 
 	</select>
 	
-	<!-- 完成事件查询 -->
+	<!-- 完成事件查询   fsy -->
 	<select id="selectEventByStatus3" parameterType="java.util.Map"
 		resultType="java.util.Map">
 
          SELECT e.comment ,e.productName,e.money,e.VideoUrl, e.CashierID ,e.PictureUrl0,  e.id ,e.status,e.result,date_format(e.date,'%Y/%m/%d %H:%i:%s') as date,e.TransID
 		,c.name as counterName from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
- c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status}
+ c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status} <!-- order by e.date desc 
+ limit 0, #{pageTotal} -->
+  <!-- convert(#{offset},signed),convert(#{pageSize},signed) -->
  		
 
 	</select>
+	
+	<select id="getEventTotalNumByStatus" parameterType="java.util.Map" resultType="int">
+	
+		SELECT count(e.id) from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
+ c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status} order by e.date
+		
+	</select>
+	
+	<select id="getWclTotal" parameterType="java.util.Map" resultType="int">
+	
+		SELECT count(e.id) from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
+ c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status} order by e.date
+		
+	</select>
+	
+	<select id="getZcTotal" parameterType="java.util.Map" resultType="int">
+	
+		SELECT count(e.id) from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
+ c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status} order by e.date
+		
+	</select>
+	
+	<select id="getWcTotal" parameterType="java.util.Map" resultType="int">
+	
+		SELECT count(e.id) from events e ,counters c,user_counter usc,users u where e.RegID=c.id AND
+ c.id=usc.counterId AND usc.userId=u.id and u.id=#{usrID} and e.status=#{status} order by e.date
+		
+	</select>
+	
+	
 	
 	<update id="updateById">
 	

@@ -28,7 +28,7 @@
 			}
 			
 .mui-control-content {
-				height: 150px;
+				/* height: 150px; */
 			}
  .mui-segmented-control .mui-control-item.mui-active {
     color: white;
@@ -75,9 +75,9 @@ border-color: #5D9CEC;
 <body>
 	<div id="app">
 	
-	<!-- <div style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
-		<img  style="margin-top: 230px;"  alt="" src="http://localhost:8080/static/img/loading.gif">
-	</div> -->
+	<div v-show="loadingPage" style="position: fixed;top:0px;z-index: 9999;background-color: #FFFFFF;width: 100%;height: 800px;text-align: center;">
+		<img  style="margin-top: 230px;"  alt="" src="http://111.231.76.125:8080/static/img/loading.gif">
+	</div>
 	
 	
 	<header class="mui-bar mui-bar-nav">
@@ -135,8 +135,6 @@ border-color: #5D9CEC;
 			
 			<div>
 				<div class="mui-control-content " v-bind:class="{'mui-active':syyActive}">
-					<div id="scroll" class="mui-scroll-wrapper">
-						<div class="mui-scroll">
 							<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
 								<tr>
 								<th width=20%>排名</th>
@@ -145,7 +143,7 @@ border-color: #5D9CEC;
 									<th width=20%>出错率</th>
 									<th width=20%>所属门店</th>
 								</tr>
-								<tr v-for="(item, index) in syyList">
+								<tr  @tap="changePie(item ,$event)" v-for="(item, index) in syyList">
 									<td>{{index+1}}</td> 
 									<td>{{item.c_id}}</td>
 									<td>{{item.s_num}}</td> 
@@ -154,8 +152,6 @@ border-color: #5D9CEC;
 								</tr>
 							</table>
 							
-						</div>
-					</div>
 				</div>
 				<div class="mui-control-content" v-bind:class="{'mui-active': !syyActive }">
 					<table width="100%" style="height:100px; overflow:scroll;" class="table" id="">
@@ -166,11 +162,11 @@ border-color: #5D9CEC;
 									<th width=20%>平均处理时间</th>
 									<th width=20%>所属门店</th>
 								</tr>
-								<tr v-for="(item, index) in fsyList">
+								<tr @tap="changePie(item ,$event)" v-for="(item, index) in fsyList">
 									<td>{{index+1}}</td> 
 									<td>{{item.userName}}</td>
 									<td>{{item.actionEventNum}}</td> 
-									<td>{{item.avgActionTime}}</td>
+									<td>{{item.avgActionTime | strFilter}}</td>
 									<td>{{item.shopName}}</td>
 								</tr>
 							</table>
@@ -203,10 +199,11 @@ border-color: #5D9CEC;
 					</div> -->
 				</form>
 			</div>
-			<button v-on:tap="saveShop"  type="button" class="mui-btn mui-btn-primary mui-btn-block " style="position: fixed;bottom:0px;margin-bottom: 0px;">保存</button>
+			<button  v-on:tap="saveShop"  type="button" class="mui-btn mui-btn-primary mui-btn-block " style="position: fixed;bottom:0px;margin-bottom: 0px;">保存</button>
 </div>
 	
-
+<!-- 圆饼图 -->
+			<div v-show="pieChart" id="echarts-pie-chart" style="height: 250px;width:100%;margin-top: 10px;"></div>
 	</div><!-- end  div -->
 <script type="text/javascript" charset="utf-8">
 
@@ -223,6 +220,8 @@ var roleId=getQueryString("roleId");
 var shopID=getQueryString("shopID");
 var areaID=getQueryString("areaID");
 var usrName=getQueryString("usrName");
+
+var vueWindow=window;
 
 //单页面vue实例
 var app = new Vue({
@@ -250,10 +249,12 @@ var app = new Vue({
 		
 		shopPage : false,//门店列表页面
 		mainPage : true,//单页面应用主页
+		loadingPage:true,
 		
 		opt : false,//右上角菜单列表
 		backBtn : false,//返回按钮
 		optBtn : true,//右上角菜单按钮
+		pieChart:true,
 		
 		chooseShop:[],//被选中的商店
 		
@@ -390,19 +391,20 @@ var app = new Vue({
 			//event.cancelBubble = true;
 			var _self=this;
 			mui.toast('保存后才会生效哦！')
-			var t;
-			t = setTimeout(function (){
+			//var t;
+			//t = setTimeout(function (){
 				
 				_self.mainPage=false;
 				_self.shopPage=true;
 				_self.opt=false;
 				_self.backBtn=true;
 				_self.optBtn=false;
+				_self.pieChart=false;
 				console.log(_self.chooseShop);
 				_self.chooseShop=[];
 				
 				
-			}, 100); 
+			//}, 100); 
 			
 			//mui.toast(this.chooseShop)
 		},
@@ -411,6 +413,7 @@ var app = new Vue({
 			this.shopPage=false;
 			this.backBtn=false;
 			this.optBtn=true;
+			this.pieChart=true;
 		},
 		saveShop:function(){//未完成
 			
@@ -428,11 +431,12 @@ var app = new Vue({
 			console.log("切换到"+event.target.innerHTML+"tab!");
 			var str=event.target.innerHTML;
 			this.syyActive=str=='收银员'?true:false;
-			//data 操作 
-			/* if(){
-				
-			} */
 			
+			if(str=='收银员'){//饼图默认加载第一个收银员
+				this.changePie(this.syyList[0]);
+			}else{
+				this.changePie(this.fsyList[0]);
+			}
 		},
 		getFsyAndSyyList : function(){//获取防损员 收银员 列表数据
 			
@@ -465,9 +469,24 @@ var app = new Vue({
 					console.log('请求失败:'+xhr+'\n'+type+'\n'+errorThrown);
 				}
 			});
-			
-			
 		},
+		changePie : function(item,event){
+			if(typeof(event)=='undefined'){
+			}else{
+				//console.log(event.target.parentElement.parentElement.children);
+				var trs=event.target.parentElement.parentElement.children;
+				for(var i=1;i<trs.length;i++){
+					trs[i].style.backgroundColor="white";
+					trs[i].style.color="grey";
+				}
+				event.target.parentElement.style.backgroundColor='#5D9CEC';
+				event.target.parentElement.style.color='white';
+			}
+			pieEcharts(item);
+		},
+		
+		
+		
 			
 		},//method   end>>>>>>>>
 		mounted:function(){
@@ -475,11 +494,38 @@ var app = new Vue({
 			this.loadEventCount();
 			this.loadShopList();
 			this.getFsyAndSyyList();
+			
+			var that=this;
+			
+			var dsq;
+			dsq=setInterval(function(){
+				console.log("mounted dsq")
+				if(typeof(that.syyList)=='undefined'){
+					
+				}else{
+					that.changePie(that.syyList[0]);
+					that.loadingPage=false;
+					vueWindow.clearInterval(dsq);
+				}
+			},20)
+			
+			
 		},
 		filters:{
 			toPercent:function(value){
 				return value.toFixed(2)+'%';
-			}
+			},
+			strFilter:function(value){
+				switch(value){
+					case '11574074074天1小时46分39秒':
+						return '0';
+					break;
+					default:
+						return value;
+					break;
+				
+				}
+			},
 		},
 	});
 	
@@ -723,6 +769,129 @@ function scatterEcharts(){
 				
 }
 
+
+function pieEcharts(item){
+	
+	//console.log(item.c_id)
+	var pieChart=echarts.init(document.getElementById('echarts-pie-chart'));
+	option = {
+		    title : {
+		        text: '1号收银员',
+		        subtext: '收银总次数:600次',
+		        x:'right'
+		    },
+		    tooltip : {
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b} : {c} ({d}%)"
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        left: 'left',
+		        data: ['正确次数','出错次数']
+		    },
+		    series : [
+		        {
+		            name: '事件占比',
+		            type: 'pie',
+		            radius : '55%',
+		            center: ['50%', '60%'],
+		            data:[
+		                {value:300, name:'正确次数'},
+		                {value:300, name:'出错次数'},
+		            ],
+		            itemStyle: {
+		                emphasis: {
+		                    shadowBlur: 10,
+		                    shadowOffsetX: 0,
+		                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+		                }
+		            }
+		        }
+		    ]
+		};
+	
+	option2 = {//环形图
+			title : {
+		        text: '1号收银员',
+		        subtext: '收银总次数:600次',
+		        x:'right'
+		    },
+			tooltip: {
+		        trigger: 'item',
+		        formatter: "{a} <br/>{b}: {c} ({d}%)"
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        x: 'left',
+		        data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+		    },
+		    series: [
+		        {
+		            name:'访问来源',
+		            type:'pie',
+		            radius: ['50%', '70%'],
+		            avoidLabelOverlap: false,
+		            label: {
+		                normal: {
+		                    show: false,
+		                    position: 'center'
+		                },
+		                emphasis: {
+		                    show: true,
+		                    textStyle: {
+		                        fontSize: '30',
+		                        fontWeight: 'bold'
+		                    }
+		                }
+		            },
+		            labelLine: {
+		                normal: {
+		                    show: false
+		                }
+		            },
+		            data:[
+		                {value:335, name:'直接访问'},
+		                {value:310, name:'邮件营销'},
+		                {value:234, name:'联盟广告'},
+		                {value:135, name:'视频广告'},
+		                {value:1548, name:'搜索引擎'}
+		            ]
+		        }
+		    ]
+		};
+	
+	
+			if(typeof(item.c_id)=='undefined'){//this is  fsy
+				option2.title.text=item.userName;
+				option2.title.subtext='处理总次数:'+item.actionEventNum;
+				option2.legend.data=[item.userName,'其他防损员'];
+				option2.series[0].data=[];
+				option2.series[0].data[0]={value:item.actionEventNum,name:item.userName};
+				var others=0;
+				for(var i=0;i<app.fsyList.length;i++){
+					others+=parseInt(app.fsyList[i].actionEventNum);
+				}
+				
+				others-=parseInt(item.actionEventNum);
+				option2.series[0].data[1]={value:others,name:'其他防损员'};
+				option.series[0].name='处理事件占比';
+				
+				
+				pieChart.setOption(option2);
+			}else{
+				option.title.text=item.c_id;
+				option.title.subtext='收银总次数:'+item.s_num;
+				option.legend.data=['正确次数','出错次数'];
+				option.series[0].name='事件占比';
+				option.series[0].data=[{value:(item.s_num-item.e_num), name:'正确次数'},{value:item.e_num, name:'出错次数'},];
+				pieChart.setOption(option);
+			}
+	
+	
+	
+	
+	
+}
 
 //
 

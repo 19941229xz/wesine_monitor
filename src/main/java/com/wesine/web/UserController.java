@@ -135,7 +135,8 @@ public class UserController {
 			
 			if(judgeNum.equals("2")){//如果新注册角色为防损员  生成防损员基本信息  主键还是userid
 				conditionMap.put("shopName", shopMapper.getShopNameByID(conditionMap.get("shopId")+""));
-				
+				conditionMap.put("actionEventNum", 0);
+				//conditionMap.put("avgActionTime", 999999999);//设置到很大
 				fsyMapper.insertFsy(conditionMap);
 				System.out.println("新增加一防损员信息！");
 			}

@@ -341,10 +341,10 @@ var vueWindow=window;
 			isNoEventShow:false,
 			noEventTip:'没有未处置事件',
 			
-			managerPage:true,
-			eventListPage:false,
-			counterEditPage:false,
-			detailPage:false,
+			managerPage : true,
+			eventListPage : false,
+			counterEditPage : false,
+			detailPage : false,
 			
 			back_button:false,//左上角返回按钮是否可见
 			counterOption:false,
@@ -397,6 +397,7 @@ var vueWindow=window;
                     timeout : 10000,
                     success : function(data){ 
                     	if(data.status==="2"){
+                    		_self.loadingPage=false;
                     		//提示关联款台
                     		var btnArray = ['否', '是'];
 
@@ -407,18 +408,17 @@ var vueWindow=window;
 								_self.toEditCounter();
                     		} else {
                     		//不去关联款台
-                    		var t;
-                    		t=setTimeout(function(){
+                    		/* dsq=setInterval(function(){
                     			_self.loadEventCount();
-                    		},5000)
-                    		
+                    		},5000) */
+                    			_self.startDsqForNoCounter();
 			                       	
 			                }
 			
 			                })
                     	}else{
                     	
-                    	
+                    	//vueWindow.clearInterval(dsq);
                         //var result = eval('('+ data +')');    //js原生方法解析json字符串为json对象
                     	//vue.data  load  data
                         _self.eventsStatus0=data.eventsStatus0;
@@ -427,7 +427,7 @@ var vueWindow=window;
                     	//加载周事件  （防损员huo防损经理）
                     	_self.eventsForThisWeek=data.eventsForThisWeek;
                     	_self.eventsForThisMonth=data.eventsForThisMonth;
-                    	console.log(data.eventsForThisWeek)
+                    	//console.log(data.eventsForThisWeek)
                     	//登陆页面后 默认先加载未处理事件
                     	_self.selectedEvents=data.eventsStatus0;
                     	//默认用户进来先选择了 未处理事件列表
@@ -492,6 +492,10 @@ var vueWindow=window;
 						}
 						//取消定时器
 						vueWindow.clearInterval(wcldsq);
+					}
+					if((count*300)>500){
+						_self.loadingPage=true;
+						_self.loadEventCount();
 					}
 					
 				},300);
@@ -616,12 +620,23 @@ var vueWindow=window;
 				mui.toast('点击保存绑定才会生效喔')
 				this.title='13s';
 				
-				var _that=this;
+				var that=this;
 				
-				var t;//一个bug暂时这么解决一下
+				/* var t;//一个bug暂时这么解决一下
 				t = setTimeout(function (){
-					_that.showRelatedCounters();
-				}, 400);
+					that.showRelatedCounters();
+				}, 200); */
+				
+				var dsq;
+				dsq=setInterval(function(){
+					if(that.userCounter.length==that.counterPicked.length){
+						vueWindow.clearInterval(dsq);
+					}else{
+						that.showRelatedCounters();
+					}
+				},20)
+				
+				
 				
 			},
 			closeCounterOpt:function(){
@@ -770,12 +785,11 @@ var vueWindow=window;
 		                    timeout : 10000,
 		                    success : function(data){
 		                    	if(data.status==0){
-		                      		mui.toast('保存成功');
 		                      		//跳转到manager页面  重载event数据  和 counter数据
 		                      		_self.loadEventCount();
 		                      		_self.loadCounterListData();
 		                      		_self.back();
-		                      		
+		                      		mui.toast('保存成功');
 		                      	}
 		                    },
 		                    error : function(xhr,type,errorThrown){
@@ -970,6 +984,37 @@ var vueWindow=window;
 					  }
 				  }
 			},
+			delUndefined:function(value){
+				this.detailEvent.comment=value=="undefined"?"":value;
+			},
+			startDsqForNoCounter:function(){
+				var that=this;
+				var dsq;
+				dsq=setInterval(function(){
+					
+					if(that.userCounter.length==0||that.userCounter==null||typeof(that.userCounter)=='undefined'){
+						var btnArray = ['否', '是'];
+						//!(that.managerPage||that.eventListPage||that.detailPage)
+						if(!(that.managerPage||that.eventListPage||that.detailPage)==false){
+							mui.confirm('是否现在去关联款台？', '未关联款台', btnArray, function(e) {
+
+	                    		if (e.index == 1) {
+	                        	//去关联款台
+									that.toEditCounter();
+	                    		} else {
+	                    			that.startDsqForNoCounter();
+				                       	
+				                }
+				
+				                })
+						}
+							
+					}else{
+						vueWindow.clearInterval(dsq)
+					}
+					
+				},20000)
+			},
 			
 			
 			
@@ -1049,6 +1094,7 @@ var vueWindow=window;
 			},//过滤器 end
 			watch: {//vue  监听器  
 		        'eventListPage': 'clearFinalNum',//监听key变化  执行value函数 
+		        'detailEvent.comment':'delUndefined',
 		    }
 	}) 
 </script>
@@ -1153,24 +1199,25 @@ var vueWindow=window;
 	var dsq;
 	var count=0;
 	dsq=setInterval(function(){
-		console.log('dsq excute：'+(++count));
-		
+		//console.log('dsq excute：'+(++count));
+		count++;
 			if(roleId=='1'){
 				
 				if(typeof(app.eventsForThisWeek)=="undefined"||app.eventsForThisWeek==null||app.eventsForThisWeek.length==0){
-					console.log("weekdata undefined!")
+					//console.log("weekdata undefined!")
 					return;
 				}
 				
 				option.series[0].data=app.eventsForThisWeek;
 				//console.log("echarts-week:"+app.eventsForThisWeek)
 				eventChart.setOption(option);
+				console.log('eventChart加载时间:'+(count*10)+'ms!')
 				//清楚dsq
 				window.clearInterval(dsq);
 			}else{
 				
-				if(typeof(app.eventsForThisMonth)=="undefined"||app.eventsForThisMonth==null||app.eventsForThisMonth.length==0){
-					console.log("monthdata undefined!")
+				if(typeof(app.eventsForThisMonth)=="undefined"||app.eventsForThisMonth==null){
+					//console.log("monthdata undefined!")
 					return;
 				}
 				
@@ -1190,6 +1237,7 @@ var vueWindow=window;
 				//console.log("echarts-month:"+app.eventsForThisMonth)
 				eventChart.setOption(option);
 				//清楚dsq
+				console.log('eventChart加载时间:'+(count*10)+'ms!')
 				window.clearInterval(dsq);
 			}
 		
